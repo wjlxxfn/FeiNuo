@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace FeiNuo.Models;
+namespace FeiNuo.Admin.Models;
 
 /// <summary>
 /// 实体类：参数配置

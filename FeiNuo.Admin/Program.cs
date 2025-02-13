@@ -1,8 +1,8 @@
 ﻿global using FeiNuo.Core;
-using FeiNuo.Models;
+using FeiNuo.Admin.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace WebApi;
+namespace FeiNuo.Admin;
 
 public class Program
 {

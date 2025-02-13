@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
-namespace FeiNuo.Models;
+namespace FeiNuo.Admin.Models;
 
 public partial class FNDbContext : DbContext
 {

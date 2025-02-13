@@ -1,6 +1,4 @@
-﻿using FeiNuo.Models;
-
-namespace FeiNuo.Services;
+﻿namespace FeiNuo.Admin.Models;
 
 public class DbInitializer
 {
