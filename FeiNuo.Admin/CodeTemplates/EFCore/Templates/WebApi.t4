@@ -1,0 +1,56 @@
+﻿export interface <#=entityName#>Dto {
+<#
+    foreach (var property in entityType.GetProperties().OrderBy(p => p.GetColumnOrder() ?? -1))
+    {
+        var needsNullable =( Options.UseNullableReferenceTypes && property.IsNullable && !property.ClrType.IsValueType)
+            ||(code.Reference(property.ClrType)).Contains("?");
+        var propName = property.Name.Substring(0,1).ToLower()+property.Name.Substring(1);
+        if(propName=="UpdateTime"||propName=="UpdateBy") continue;
+        var tsType = code.Reference(property.ClrType).Replace("?","");
+        if(property.IsPrimaryKey()||property.IsForeignKey()) tsType="IdType";
+        if(tsType.Contains("decimal")||tsType=="int"||tsType=="double"||tsType=="long"||tsType=="float"||tsType=="short") tsType = "number";
+        if(tsType=="bool") tsType="boolean";
+        if(tsType.Contains("DateTime")) tsType="string";
+        if(tsType=="char") tsType="string";
+        if(tsType=="Guid") tsType="string";
+#>
+  <#=propName#><#= needsNullable ? "?" : "" #>: <#=tsType#>; // <#=  string.IsNullOrEmpty(property.GetComment()) ? "" : code.XmlComment(property.GetComment()) #>
+<#
+    }
+#>
+}
+
+const baseUrl = '/api/<#= cfg.ModuleName.ToLower() #>/<#=entityName.Pluralize().Camelize()#>';
+
+/** 查单个 */
+export function get<#=entityName#>(<#=pkProperty#>: IdType): Promise<<#=entityName#>Dto> {
+  return request.get(baseUrl + '/' + <#=pkProperty#>);
+}
+
+/** 查集合 */
+export function get<#=entityName#>List(query: PageQuery): Promise<PageResult<<#=entityName#>Dto>> {
+  return request.get(baseUrl, { params: query });
+}
+
+/** 新增/修改 */
+export function save<#=entityName#>(<#= buProperty #>: <#=entityName#>Dto): Promise<<#=entityName#>Dto> {
+  return <#= buProperty #>.<#=pkProperty#> ? request.put(baseUrl + '/' + <#= buProperty #>.<#=pkProperty#>, <#= buProperty #>) : request.post(baseUrl, <#= buProperty #>);
+}
+
+/** 删除 */
+export function delete<#=entityName#>ByIds(ids: IdType[]): Promise<void> {
+  return request.delete(baseUrl, { params: { ids } });
+}
+
+/** 导出 */
+export function exportData(query: PageQuery): Promise<void> {
+  return new Promise((resolve, reject) => {
+    request
+      .get(baseUrl + '/export', { params: query, responseType: 'blob' })
+      .then((res) => {
+        downloadBlobFile(res);
+        resolve();
+      })
+      .catch((err) => reject(err));
+  });
+}

@@ -1,0 +1,77 @@
+﻿<template>
+  <q-dialog ref="dialogRef" @hide="onDialogHide">
+    <q-card class="q-form-dialog" style="width: 400px">
+      <!-- 标题 -->
+      <q-toolbar>
+        <q-toolbar-title>{{ isNew ? '新增' : '编辑' }}<#=tableComment#></q-toolbar-title>
+        <q-btn v-close-popup icon="close" round flat />
+      </q-toolbar>
+      <q-separator />
+
+      <!-- 内容 -->
+      <q-card-section>
+        <q-form ref="formRef" @submit="handleSubmit">
+<#
+    foreach (var property in entityType.GetProperties().Where(t=>!systemFields.Contains(t.Name) && !t.IsPrimaryKey()).OrderBy(p => p.GetColumnOrder() ?? -1))
+    {
+        var propName = property.Name.Substring(0,1).ToLower()+property.Name.Substring(1);
+        if(propName=="disabled") continue;
+        var needsNullable =( Options.UseNullableReferenceTypes && property.IsNullable && !property.ClrType.IsValueType)
+            ||(code.Reference(property.ClrType)).Contains("?");
+        var extraAtt = "";
+        if(propName=="remark") extraAtt += " type=\"textarea\" rows=\"3\"";
+        if(!needsNullable) extraAtt += " :rules=\"[required]\"";
+#>
+          <q-form-item lable="<#=  string.IsNullOrEmpty(property.GetComment()) ? "" : code.XmlComment(property.GetComment()) #>">
+            <q-input v-model="dto.<#=propName#>"<#=extraAtt#> /> 
+          </q-form-item>
+<#
+    }
+#>
+        </q-form>
+      </q-card-section>
+
+      <!-- 操作 -->
+      <q-separator />
+      <q-card-actions align="right">
+        <q-btn label="取消" outline @click="onDialogCancel" />
+        <q-btn label="确定" color="primary" icon="save" :loading="loading" @click="formRef?.submit()" />
+      </q-card-actions>
+    </q-card>
+  </q-dialog>
+</template>
+
+<script setup lang="ts">
+  defineOptions({ name: '<#=entityName#>Form' });
+
+  import { QForm, useDialogPluginComponent } from 'quasar';
+  import { type <#=entityName#>Dto, get<#=entityName#>, save<#=entityName#> } from 'src/api/<#=cfg.ModuleName.Kebaberize()#>/<#=entityName.Kebaberize()#>';
+
+  // 属性事件
+  const { dialogRef, onDialogHide, onDialogOK, onDialogCancel } = useDialogPluginComponent();
+  defineEmits([...useDialogPluginComponent.emits]);
+  const props = withDefaults(defineProps<{ id?: IdType }>(), { id: 0 });
+  const isNew = props.id === 0 || props.id === undefined || props.id === '';
+
+  // 加载数据
+  const { required } = useValidation();
+  const dto = ref<<#=entityName#>Dto>({} as <#=entityName#>Dto);
+  onMounted(() => {
+    if (!isNew) {
+      get<#=entityName#>(props.id).then((<#=buProperty#>) => (dto.value = <#=buProperty#>));
+    }
+  });
+
+  // 保存提交
+  const formRef = ref<QForm>();
+  const loading = ref(false);
+  function handleSubmit() {
+    loading.value = true;
+    save<#=entityName#>(dto.value)
+      .then(() => {
+        Message.success('保存成功');
+        onDialogOK();
+      })
+      .finally(() => setTimeout(() => (loading.value = false), 300));
+  }
+</script>

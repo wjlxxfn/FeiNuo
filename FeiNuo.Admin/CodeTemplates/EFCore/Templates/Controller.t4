@@ -1,0 +1,105 @@
+﻿using <#=cfg.RootNameSpace#>.Services<#= cfg.ModuleName == "" ? "" : ("."+cfg.ModuleName)#>;
+using Microsoft.AspNetCore.Mvc;
+
+namespace <#=cfg.RootNameSpace#>.Controllers<#= cfg.ModuleName == "" ? "" : ("."+cfg.ModuleName)#>
+{
+    /// <summary>
+    /// API接口：<#=tableComment#>
+    /// </summary>
+    [Route("api/<#=cfg.ModuleName == ""?"" : (cfg.ModuleName.ToLower() + "/") #><#=entityName.Pluralize().Camelize()#>")]
+    public class <#= entityName #>Controller : BaseController
+    {
+        #region 构造函数
+        private readonly <#=entityName#>Service service;
+        public <#=entityName#>Controller(<#=entityName#>Service service)
+        {
+            this.service = service;
+        }
+        #endregion
+
+        #region 查询导出 
+        /// <summary>
+        /// 分页查询
+        /// </summary>
+        [HttpGet]
+        public async Task<PageResult<<#=entityName#>Dto>> Get<#=entityName#>List([FromQuery] <#=entityName#>Query query, [FromQuery] Pager pager)
+        {
+            return await service.FindPagedList(query, pager, CurrentUser);
+        }
+
+        /// <summary>
+        /// 主键查询
+        /// </summary>
+        /// <param name="<#=pkProperty#>">主键ID</param>
+        [HttpGet("{<#=pkProperty#>}")]
+        public async Task<<#=entityName#>Dto> Get<#=entityName#>(<#= pkPropertyType #> <#=pkProperty#>)
+        {
+            return await service.Get<#=entityName#>(<#=pkProperty#>);
+        }
+
+        /// <summary>
+        /// 导出Excel
+        /// </summary>
+        [HttpGet("export")]
+        public async Task<ActionResult> Export<#=entityName.Pluralize()#>([FromQuery] <#=entityName#>Query query)
+        {
+            var pager = await service.FindPagedList(query, Pager.Unpaged, CurrentUser);
+            var excel = new ExcelConfig($"<#=tableComment#>导出{DateTime.Now:yyyyMMddHHmmss}.xlsx", pager.DataList, [
+<#          
+            foreach (var property in entityType.GetProperties().Where(t=>t.Name!="UpdateBy"&&t.Name!="UpdateTime" && !t.IsPrimaryKey()).OrderBy(p => p.GetColumnOrder() ?? -1)) 
+            {
+#>
+                new ExcelColumn<<#=entityName#>Dto>("<#=string.IsNullOrEmpty(property.GetComment())?"":code.XmlComment(property.GetComment())#>", d => d.<#=property.Name#>, 15),
+<#          
+            }
+#>
+            ]);
+            var bytes = PoiHelper.GetExcelBytes(excel);
+            return File(bytes, excel.ContentType, excel.FileName);
+        }
+        #endregion
+
+        #region 增 删 改
+        /// <summary>
+        /// 新增<#=tableComment#>
+        /// </summary>
+        [HttpPost]
+        [Log("新增<#=tableComment#>", OperateType.Create, false, true)]
+        public async Task<ActionResult<<#=entityName#>Dto>> Create<#=entityName#>([FromBody] <#=entityName#>Dto dto)
+        {
+            dto = await service.Create<#=entityName#>(dto, CurrentUser);
+            return CreatedAtAction("Get<#=entityName#>", new { <#=pkProperty#> = dto.<#=pkColumn.Name#> }, dto);
+        }
+
+        /// <summary>
+        /// 修改<#=tableComment#>
+        /// </summary>
+        [HttpPut("{id}")]
+        [Log("修改<#=tableComment#>", OperateType.Update)]
+        public async Task<ActionResult> Update<#=entityName#>(<#= pkPropertyType #> id, [FromBody] <#=entityName#>Dto dto)
+        {
+            if (id != dto.<#=pkColumn.Name#>)
+            {
+                return ErrorMessage("要更新的数据和ID不匹配");
+            }
+            await service.Update<#=entityName#>(dto, CurrentUser);
+            return NoContent();
+        }
+
+        /// <summary>
+        /// 删除<#=tableComment#>
+        /// </summary>
+        [HttpDelete]
+        [Log("删除<#=tableComment#>", OperateType.Delete)]
+        public async Task<ActionResult> Delete<#=entityName#>ByIds([FromQuery] <#= pkPropertyType #>[] ids)
+        {
+            if (ids.Length == 0)
+            {
+                return ErrorMessage("参数错误：没有接收到要删除的主键值");
+            }
+            await service.Delete<#=entityName#>ByIds(ids, CurrentUser);
+            return NoContent();
+        }
+        #endregion
+    }
+}

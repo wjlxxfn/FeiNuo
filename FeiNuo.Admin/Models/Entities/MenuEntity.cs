@@ -8,7 +8,7 @@ namespace FeiNuo.Admin.Models;
 /// <summary>
 /// 实体类：菜单
 /// </summary>
-public partial class MenuEntity : FeiNuo.Core.BaseEntity
+public partial class MenuEntity : BaseEntity
 {
     /// <summary>
     /// 菜单ID

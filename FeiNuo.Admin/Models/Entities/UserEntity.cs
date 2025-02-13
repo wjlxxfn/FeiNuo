@@ -8,7 +8,7 @@ namespace FeiNuo.Admin.Models;
 /// <summary>
 /// 实体类：用户
 /// </summary>
-public partial class UserEntity : FeiNuo.Core.BaseEntity
+public partial class UserEntity : BaseEntity
 {
     /// <summary>
     /// 用户ID

@@ -1,0 +1,106 @@
+﻿<#  #>
+using <#=Options.ModelNamespace#>;
+using Mapster;
+using Microsoft.EntityFrameworkCore;
+
+namespace <#=cfg.RootNameSpace#>.Services<#= cfg.ModuleName == "" ? "" : ("."+cfg.ModuleName)#>
+{
+    /// <summary>
+    /// 服务类：<#=tableComment#>
+    /// </summary>
+    public class <#=entityName#>Service : BaseService<<#=entityType.Name#>Entity>
+    {
+        #region 构造函数
+        protected readonly <#= Options.ContextName #> ctx;
+        public <#=entityName#>Service(<#= Options.ContextName #> ctx) : base(ctx)
+        {
+            this.ctx = ctx;
+        }
+        #endregion
+
+        #region 数据查询 
+        /// <summary>
+        /// 分页查询
+        /// </summary>
+        public async Task<PageResult<<#=entityName#>Dto>> FindPagedList(<#=entityName#>Query query, Pager pager, LoginUser user)
+        {
+            var lstData = await FindPagedList(query, pager, o => o.OrderByDescending(t => t.CreateTime));
+            return lstData.Map(o => o.Adapt<<#=entityName#>Dto>());
+        }
+
+        /// <summary>
+        /// 根据<#=tableComment#>ID查询
+        /// </summary>
+        public async Task<<#=entityName#>Dto> Get<#=entityName#>(<#=pkPropertyType#> <#=pkProperty#>)
+        {
+            var entity = await FindByIdAsync(<#=pkProperty#>);
+            return entity.Adapt<<#=entityName#>Dto>();
+        }
+        #endregion
+
+        #region 增 删 改
+        /// <summary>
+        /// 新增<#=tableComment#>
+        /// </summary>
+        public async Task<<#=entityName#>Dto> Create<#=entityName#>(<#=entityName#>Dto dto, LoginUser user)
+        {
+            // 新建对象
+            var entity = new <#=entityType.Name#>Entity();
+            // 复制属性
+            await CopyDtoToEntity(dto, entity, user, true);
+            // 执行保存
+            ctx.<#= dbSetName #>.Add(entity);
+            await ctx.SaveChangesAsync();
+            // 返回Dto
+            return entity.Adapt<<#=entityName#>Dto>();
+        }
+
+        /// <summary>
+        /// 修改<#=tableComment#>
+        /// </summary>
+        public async Task Update<#=entityName#>(<#=entityName#>Dto dto, LoginUser user)
+        {
+            // 原始数据
+            var entity = await FindByIdAsync(dto.<#=pkColumn.Name#>);
+            // 更新字段
+            await CopyDtoToEntity(dto, entity, user, false);
+            // 执行更新
+            await ctx.SaveChangesAsync();
+        }
+
+        /// <summary>
+        /// 复制dto属性到实体字段
+        /// </summary>
+        private async Task CopyDtoToEntity(<#=entityName#>Dto dto, <#=entityType.Name#>Entity entity, LoginUser user, bool isNew)
+        {
+            //TODO 检查数据重复
+            if (await ctx.<#= dbSetName #>.AnyAsync(a => a.<#=pkColumn.Name#> != dto.<#=pkColumn.Name#> /* && (a.Name == dto.Name )*/))
+            {
+                throw new MessageException("当前已存在相同名称或编码的<#=tableComment#>");
+            }
+
+            // 复制属性
+            dto.Adapt(entity);
+
+            // 记录操作人
+            entity.AddOperator(user.Username, isNew);
+        }
+
+        /// <summary>
+        /// 根据ID删除<#=tableComment#>
+        /// </summary>
+        public async Task Delete<#=entityType.Name#>ByIds(IEnumerable<<#=pkPropertyType#>> ids, LoginUser user)
+        {
+            foreach (var id in ids)
+            {
+                var <#=buProperty#> = await ctx.<#= dbSetName #>.FindAsync(id);
+                if (<#=buProperty#> == null) throw new MessageException($"不存在【id={id}】的<#=tableComment#>。");
+                //TODO 判断是否能删除
+                ctx.<#= dbSetName #>.Remove(<#=buProperty#>);
+            }
+            // 提交事务
+            await ctx.SaveChangesAsync();
+        }
+        #endregion
+    }
+}

@@ -8,7 +8,7 @@ namespace FeiNuo.Admin.Models;
 /// <summary>
 /// 实体类：部门
 /// </summary>
-public partial class DeptEntity : FeiNuo.Core.BaseEntity
+public partial class DeptEntity : BaseEntity
 {
     /// <summary>
     /// 部门ID

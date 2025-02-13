@@ -1,0 +1,73 @@
+﻿<!-- <#=tableComment#> -->
+<template>
+  <q-page class="q-pa-sm">
+    <!-- 查询操作 -->
+    <q-toolbar class="search-bar">
+      <table-filter :query="query" @change="handleQuery()"></table-filter>
+      <q-space />
+      <q-btn label="新增" color="primary" icon="create" @click="handleAdd" />
+      <q-btn label="删除" color="error" icon="delete" :disable="!hasSelected" @click="handleDelete()" />
+      <q-btn label="导出" color="warning" icon="export" :loading="exportLoading" @click="handleExport" />
+    </q-toolbar>
+
+    <!-- 数据表格 -->
+    <q-table :columns="columns" selection="multiple" v-bind="tableOptions">
+      <template #body-cell-action="props">
+        <q-td :props="props">
+          <q-btn flat color="primary" label="编辑" @click="handleEdit(props.row.<#=pkProperty#>)" />
+          <q-btn flat color="error" label="删除" @click="handleDelete(props.row)" />
+        </q-td>
+      </template>
+    </q-table>
+  </q-page>
+</template>
+
+<script setup lang="ts">
+  defineOptions({ name: '<#=entityType.Name=="Menu"?"TMenu":entityType.Name#>' });
+
+  import <#=entityName#>Form from './<#=entityName#>Form.vue';
+  import { type <#=entityName#>Dto, get<#=entityName#>List, delete<#=entityName#>ByIds, exportData } from 'src/api/<#=cfg.ModuleName.Kebaberize()#>/<#=entityName.Kebaberize()#>';
+
+  // 查询
+  const query = usePageQuery();
+
+  // 表格
+  const { tc, tableOptions, hasSelected, selectedIds, handleQuery } = useTableServer<<#=entityName#>Dto>(get<#=entityName#>List, query, '<#=pkProperty#>');
+  const columns = [
+<#
+    foreach (var property in entityType.GetProperties().Where(t=>!systemFields.Contains(t.Name) && !t.IsPrimaryKey()).OrderBy(p => p.GetColumnOrder() ?? -1))
+    {
+        var propName = property.Name.Substring(0,1).ToLower()+property.Name.Substring(1);
+#>
+    tc('<#=propName#>', '<#=property.GetComment()#>'<#=propName=="remark"?", { wrap: true, minWidth: 200 }":""#>),
+<#
+    }
+#>
+    tc('CreateBy', '创建人', 'center'),
+    tc('CreateTime', '创建时间', 'center'),
+    tc('action', '操作', 'center'),
+  ];
+  // 加载数据
+  onMounted(() => handleQuery(true));
+
+  // 表单窗口
+  const { handleAdd, handleEdit } = useFormDialog(<#=entityName#>Form, handleQuery);
+
+  // 删除
+  function handleDelete(<#=buProperty#>?: <#=entityName#>Dto) {
+    const ids = <#=buProperty#> ? [<#=buProperty#>.<#=pkProperty#>] : selectedIds.value;
+    MessageBox.confirm(DEL_MESSAGE).onOk(() => {
+      delete<#=entityName#>ByIds(ids).then(() => {
+        Message.success('删除成功！');
+        handleQuery(true);
+      });
+    });
+  }
+
+  // 导出
+  const exportLoading = ref(false);
+  function handleExport() {
+    exportLoading.value = true;
+    exportData(query).finally(() => (exportLoading.value = false));
+  }
+</script>

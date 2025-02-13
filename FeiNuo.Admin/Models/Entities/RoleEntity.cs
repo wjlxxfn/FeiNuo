@@ -8,7 +8,7 @@ namespace FeiNuo.Admin.Models;
 /// <summary>
 /// 实体类：角色
 /// </summary>
-public partial class RoleEntity : FeiNuo.Core.BaseEntity
+public partial class RoleEntity : BaseEntity
 {
     /// <summary>
     /// 角色ID

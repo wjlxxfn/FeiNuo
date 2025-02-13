@@ -8,7 +8,7 @@ namespace FeiNuo.Admin.Models;
 /// <summary>
 /// 实体类：操作日志
 /// </summary>
-public partial class LogEntity : FeiNuo.Core.BaseEntity
+public partial class LogEntity : BaseEntity
 {
     /// <summary>
     /// 日志ID

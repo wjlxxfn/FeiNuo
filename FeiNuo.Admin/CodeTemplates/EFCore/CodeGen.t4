@@ -1,0 +1,143 @@
+﻿<#@ assembly name="Humanizer" #>
+<#@ import namespace="Humanizer" #>
+<#@ import namespace="System.IO" #>
+<#
+    var originContext = GenerationEnvironment;
+    /*******************************************************************************************************
+                                          代码生成配置Start
+     *******************************************************************************************************/
+     var cfg = new {
+        // 代码生成的根路径和命名空间
+        RootPath = @"E:\FeiNuo\FeiNuo\FeiNuo.Admin",
+        WebRoot = @"E:\FeiNuo\fn-admin-quasar",
+        RootNameSpace = Options.ModelNamespace.Replace(".Models",""),
+        // 过滤表,三个条件都满足的才生成
+        TablePrefixes = new string[]{ "sys_" },
+        IncludeTables = new string[]{ "sys_config"},
+        ExcludeTables = new string[]{ "sys_user","sys_dept","sys_menu" },
+        ModuleName = "System", // 模块名，路径里使用{moduleName}
+
+        GenCode = false, //是否生成代码，false的话默认只生成model，这个文件里的项目就不生成
+        Override = true, //覆盖生成
+
+        Dto        = new { Gen = true, FullName = "Services/{moduleName}/Dtos/{entityName}Dto.cs" },
+        Service    = new { Gen = false, FullName = "Services/{moduleName}/{entityName}Service.cs" },
+        Controller = new { Gen = false, FullName = "Controllers/{moduleName}/{entityName}Controller.cs" },
+
+        WebApi     = new { Gen = false, FullName = "src/api/{moduleName}/{entityName}.ts" },
+        WebPage    = new { Gen = false, FullName = "src/pages/{moduleName}/{entityName}/index.vue" },
+        WebForm    = new { Gen = false, FullName = "src/pages/{moduleName}/{entityName}/" },
+     };
+     var systemFields = new string[]{"CreateBy","CreateTime","UpdateBy","UpdateTime"};
+     /*******************************************************************************************************
+                                          代码生成配置End
+     *******************************************************************************************************/
+     string fileName="";
+     foreach (var entityType in Model.GetEntityTypes().Where(e => !e.IsSimpleManyToManyJoinEntityType()))
+     {
+        if(!cfg.GenCode) continue;
+        // 过滤表
+        if(cfg.TablePrefixes.Length > 0 && !cfg.TablePrefixes.Any(t=>entityType.GetTableName().StartsWith(t))) continue;
+        if(cfg.IncludeTables.Length > 0 && !cfg.IncludeTables.Contains(entityType.GetTableName())) continue;
+        if(cfg.ExcludeTables.Length > 0 && cfg.ExcludeTables.Contains(entityType.GetTableName())) continue;
+        /**************************定义要用到的各项变量*******************************************/
+        var entityName = entityType.Name.Replace("Entity","");
+        // 业务对象首字母小写，比如 user,dept，用于变量
+        var buProperty = entityName.Replace("Entity","").Camelize();
+        var tableComment = string.IsNullOrEmpty(entityType.GetComment()) ? "" : code.XmlComment(entityType.GetComment());
+        // 主键字段
+        var pkColumn = entityType.FindPrimaryKey().Properties.First();
+        var pkProperty =  pkColumn.Name.Camelize();
+        var pkPropertyType = code.Reference(pkColumn.ClrType);
+        var dbSetName = entityType.GetDbSetName().Pluralize();
+#>
+<# 
+        /*********************************生成DTO*********************************/
+        if(cfg.Dto.Gen && (!File.Exists(fileName) || cfg.Override))
+        {
+            fileName = Path.Combine(cfg.RootPath,cfg.Dto.FullName.Replace("{moduleName}",cfg.ModuleName).Replace("{entityName}",entityName).Replace("//","/"));
+            Directory.CreateDirectory(Path.GetDirectoryName(fileName));
+            GenerationEnvironment = new StringBuilder();
+#>
+<#@ include file=".\Templates\Dto.t4" #>
+<#
+            File.WriteAllText(fileName, GenerationEnvironment.ToString());
+        }
+#>
+
+<# 
+        /*********************************生成Service*********************************/
+        if(cfg.Service.Gen && (!File.Exists(fileName) || cfg.Override))
+        {
+            fileName =Path.Combine(cfg.RootPath,cfg.Service.FullName.Replace("{moduleName}",cfg.ModuleName).Replace("{entityName}",entityName).Replace("//","/"));
+            Directory.CreateDirectory(Path.GetDirectoryName(fileName));
+            GenerationEnvironment = new StringBuilder();
+#>
+<#@ include file=".\Templates\Service.t4" #>
+<#
+            File.WriteAllText(fileName, GenerationEnvironment.ToString());
+        }
+#>
+
+
+<# 
+        /*********************************生成Controller*********************************/
+        if(cfg.Controller.Gen && (!File.Exists(fileName) || cfg.Override))
+        {
+            fileName =Path.Combine(cfg.RootPath,cfg.Controller.FullName.Replace("{moduleName}",cfg.ModuleName).Replace("{entityName}",entityName).Replace("//","/"));
+            Directory.CreateDirectory(Path.GetDirectoryName(fileName));
+            GenerationEnvironment = new StringBuilder();
+#>
+<#@ include file=".\Templates\Controller.t4" #>
+<#
+            File.WriteAllText(fileName, GenerationEnvironment.ToString());
+        }
+#>
+
+<# 
+        /*********************************生成WebApi*********************************/
+        if(cfg.WebApi.Gen && (!File.Exists(fileName) || cfg.Override))
+        {
+            fileName =Path.Combine(cfg.WebRoot,cfg.WebApi.FullName.Replace("{moduleName}",cfg.ModuleName.Kebaberize()).Replace("{entityName}",entityName.Kebaberize()).Replace("//","/").ToLower());
+            Directory.CreateDirectory(Path.GetDirectoryName(fileName));
+            GenerationEnvironment = new StringBuilder();
+#>
+<#@ include file=".\Templates\WebApi.t4" #>
+<#
+            File.WriteAllText(fileName, GenerationEnvironment.ToString());
+        }
+#>
+
+
+<# 
+        /*********************************生成WebPage*********************************/
+        if(cfg.WebPage.Gen && (!File.Exists(fileName) || cfg.Override))
+        {
+            fileName =Path.Combine(cfg.WebRoot,cfg.WebPage.FullName.Replace("{moduleName}",cfg.ModuleName.Kebaberize()).Replace("{entityName}",entityName.Kebaberize()).Replace("//","/"));
+            Directory.CreateDirectory(Path.GetDirectoryName(fileName));
+            GenerationEnvironment = new StringBuilder();
+#>
+<#@ include file=".\Templates\WebPage.t4" #>
+<#
+            File.WriteAllText(fileName, GenerationEnvironment.ToString());
+        }
+#>
+
+<# 
+        /*********************************生成WebForm*********************************/
+        if(cfg.WebForm.Gen && (!File.Exists(fileName) || cfg.Override))
+        {
+            fileName =Path.Combine(cfg.WebRoot,cfg.WebForm.FullName.Replace("{moduleName}",cfg.ModuleName.Kebaberize()).Replace("{entityName}",entityName.Kebaberize()).Replace("//","/"))+$"{entityName}Form.vue";
+            Directory.CreateDirectory(Path.GetDirectoryName(fileName));
+            GenerationEnvironment = new StringBuilder();
+#>
+<#@ include file=".\Templates\WebForm.t4" #>
+<#
+            File.WriteAllText(fileName, GenerationEnvironment.ToString());
+        }
+#>
+<#
+    }
+    // 实体类循环结束,还原上下文生成的代码
+    GenerationEnvironment = originContext;
+#>
