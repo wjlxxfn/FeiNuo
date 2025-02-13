@@ -27,13 +27,14 @@ namespace <#=cfg.RootNameSpace#>.Services<#= cfg.ModuleName == "" ? "" : ("."+cf
             var needsNullable = Options.UseNullableReferenceTypes && property.IsNullable && !property.ClrType.IsValueType;
             var needsInitializer = Options.UseNullableReferenceTypes && !property.IsNullable && !property.ClrType.IsValueType;
             var needVadation = !systemFields.Contains(property.Name) && property.Name != pkColumn.Name;
+            var isMaxType = property.GetColumnType().Contains("max");
 #>
         /// <summary>
         /// <#= colComment #>
         /// </summary>
 <#  if(!property.IsNullable  && !property.ClrType.IsValueType && needVadation) { #>
         [Required(ErrorMessage = "【<#= colComment #>】不能为空")]
-<#  } if(code.Reference(property.ClrType)=="string"  && needVadation) { #>
+<#  } if(code.Reference(property.ClrType)=="string" &&!isMaxType  && needVadation) { #>
         [StringLength(<#=property.GetMaxLength()#>, ErrorMessage = "【<#= colComment #>】长度不能超过 <#=property.GetMaxLength()#>。")]
 <# } #>
         public <#= code.Reference(property.ClrType) #><#= needsNullable ? "?" : "" #> <#= property.Name #> { get; set; }<#= needsInitializer ? " = null!;" : "" #>

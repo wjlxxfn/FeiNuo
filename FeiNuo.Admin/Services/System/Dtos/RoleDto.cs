@@ -1,0 +1,78 @@
+using FeiNuo.Admin.Models;
+using System.ComponentModel.DataAnnotations;
+
+namespace FeiNuo.Admin.Services.System
+{
+    #region DTO属性映射    
+    //public class RoleDtoRegister : IRegister
+    //{
+    //    public void Register(TypeAdapterConfig config)
+    //    {
+    //        config.ForType<RoleEntity, RoleDto>().Map(d => d.DeptName, s => s.Dept.DeptName, s => s.Dept != null);
+    //    }
+    //}
+    #endregion
+
+    #region 数据传输对象 RoleDto
+    /// <summary>
+    /// 数据传输对象：角色
+    /// </summary>
+    public class RoleDto : BaseDto
+    {
+        /// <summary>
+        /// 角色ID
+        /// </summary>
+        public int RoleId { get; set; }
+
+        /// <summary>
+        /// 角色编码
+        /// </summary>
+        [Required(ErrorMessage = "【角色编码】不能为空")]
+        [StringLength(50, ErrorMessage = "【角色编码】长度不能超过 50。")]
+        public string RoleCode { get; set; } = null!;
+
+        /// <summary>
+        /// 角色名称
+        /// </summary>
+        [Required(ErrorMessage = "【角色名称】不能为空")]
+        [StringLength(50, ErrorMessage = "【角色名称】长度不能超过 50。")]
+        public string RoleName { get; set; } = null!;
+
+        /// <summary>
+        /// 是否作废
+        /// </summary>
+        public bool Disabled { get; set; }
+
+        /// <summary>
+        /// 备注说明
+        /// </summary>
+        [StringLength(200, ErrorMessage = "【备注说明】长度不能超过 200。")]
+        public string? Remark { get; set; }
+
+    }
+    #endregion
+
+    #region 数据查询对象
+    /// <summary>
+    /// 查询模型：角色
+    /// </summary>
+    public class RoleQuery : AbstractQuery<RoleEntity>
+    {
+        /// <summary>
+        /// 是否作废
+        /// </summary>
+        public bool? Disabled { get; set; }
+
+        /// <summary>
+        /// 根据查询条件添加查询表达式
+        /// </summary>
+        protected override void MergeQueryExpression()
+        {
+            // AddExpression(Disabled.HasValue, r => r.Disabled == Disabled!.Value);
+            // AddExpression(RoleCode, r => r.RoleCode == RoleCode);
+            // AddSearchExpression(s => o => o.RoleCode.Contains(s) || o.RoleName.Contains(s));
+            AddDateExpression(s => o => o.CreateTime >= s, e => o => o.CreateTime <= e);
+        }
+    }
+    #endregion
+}

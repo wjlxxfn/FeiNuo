@@ -1,0 +1,105 @@
+using FeiNuo.Admin.Models;
+using Mapster;
+using Microsoft.EntityFrameworkCore;
+
+namespace FeiNuo.Admin.Services.System
+{
+    /// <summary>
+    /// 服务类：角色
+    /// </summary>
+    public class RoleService : BaseService<RoleEntity>
+    {
+        #region 构造函数
+        protected readonly FNDbContext ctx;
+        public RoleService(FNDbContext ctx) : base(ctx)
+        {
+            this.ctx = ctx;
+        }
+        #endregion
+
+        #region 数据查询 
+        /// <summary>
+        /// 分页查询
+        /// </summary>
+        public async Task<PageResult<RoleDto>> FindPagedList(RoleQuery query, Pager pager, LoginUser user)
+        {
+            var lstData = await FindPagedList(query, pager, o => o.OrderByDescending(t => t.CreateTime));
+            return lstData.Map(o => o.Adapt<RoleDto>());
+        }
+
+        /// <summary>
+        /// 根据角色ID查询
+        /// </summary>
+        public async Task<RoleDto> GetRole(int roleId)
+        {
+            var entity = await FindByIdAsync(roleId);
+            return entity.Adapt<RoleDto>();
+        }
+        #endregion
+
+        #region 增 删 改
+        /// <summary>
+        /// 新增角色
+        /// </summary>
+        public async Task<RoleDto> CreateRole(RoleDto dto, LoginUser user)
+        {
+            // 新建对象
+            var entity = new RoleEntity();
+            // 复制属性
+            await CopyDtoToEntity(dto, entity, user, true);
+            // 执行保存
+            ctx.Roles.Add(entity);
+            await ctx.SaveChangesAsync();
+            // 返回Dto
+            return entity.Adapt<RoleDto>();
+        }
+
+        /// <summary>
+        /// 修改角色
+        /// </summary>
+        public async Task UpdateRole(RoleDto dto, LoginUser user)
+        {
+            // 原始数据
+            var entity = await FindByIdAsync(dto.RoleId);
+            // 更新字段
+            await CopyDtoToEntity(dto, entity, user, false);
+            // 执行更新
+            await ctx.SaveChangesAsync();
+        }
+
+        /// <summary>
+        /// 复制dto属性到实体字段
+        /// </summary>
+        private async Task CopyDtoToEntity(RoleDto dto, RoleEntity entity, LoginUser user, bool isNew)
+        {
+            //TODO 检查数据重复
+            if (await ctx.Roles.AnyAsync(a => a.RoleId != dto.RoleId /* && (a.Name == dto.Name )*/))
+            {
+                throw new MessageException("当前已存在相同名称或编码的角色");
+            }
+
+            // 复制属性
+            dto.Adapt(entity);
+
+            // 记录操作人
+            entity.AddOperator(user.Username, isNew);
+        }
+
+        /// <summary>
+        /// 根据ID删除角色
+        /// </summary>
+        public async Task DeleteRoleByIds(IEnumerable<int> ids, LoginUser user)
+        {
+            foreach (var id in ids)
+            {
+                var role = await ctx.Roles.FindAsync(id);
+                if (role == null) throw new MessageException($"不存在【id={id}】的角色。");
+                //TODO 判断是否能删除
+                ctx.Roles.Remove(role);
+            }
+            // 提交事务
+            await ctx.SaveChangesAsync();
+        }
+        #endregion
+    }
+}
