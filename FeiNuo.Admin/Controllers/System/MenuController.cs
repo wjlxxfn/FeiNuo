@@ -19,6 +19,15 @@ namespace FeiNuo.Admin.Controllers.System
 
         #region 查询导出 
         /// <summary>
+        /// 查询菜单树
+        /// </summary>
+        [HttpGet("tree")]
+        public async Task<List<MenuDto>> GetMenuTree()
+        {
+            return await service.GetMenuTree();
+        }
+
+        /// <summary>
         /// 分页查询
         /// </summary>
         [HttpGet]

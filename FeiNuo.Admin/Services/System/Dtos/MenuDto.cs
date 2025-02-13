@@ -1,16 +1,17 @@
 using FeiNuo.Admin.Models;
+using Mapster;
 using System.ComponentModel.DataAnnotations;
 
 namespace FeiNuo.Admin.Services.System
 {
     #region DTO属性映射    
-    //public class MenuDtoRegister : IRegister
-    //{
-    //    public void Register(TypeAdapterConfig config)
-    //    {
-    //        config.ForType<MenuEntity, MenuDto>().Map(d => d.DeptName, s => s.Dept.DeptName, s => s.Dept != null);
-    //    }
-    //}
+    public class MenuDtoRegister : IRegister
+    {
+        public void Register(TypeAdapterConfig config)
+        {
+            config.ForType<MenuEntity, MenuDto>().Map(d => d.Children, s => s.Children.Select(t => t.Adapt<MenuDto>()), s => s.Children.Count > 0);
+        }
+    }
     #endregion
 
     #region 数据传输对象 MenuDto
@@ -72,6 +73,10 @@ namespace FeiNuo.Admin.Services.System
         [StringLength(200, ErrorMessage = "【备注说明】长度不能超过 200。")]
         public string? Remark { get; set; }
 
+        /// <summary>
+        /// 下级菜单
+        /// </summary>
+        public List<MenuDto>? Children { get; set; }
     }
     #endregion
 

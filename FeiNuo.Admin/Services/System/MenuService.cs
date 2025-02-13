@@ -19,6 +19,15 @@ namespace FeiNuo.Admin.Services.System
 
         #region 数据查询 
         /// <summary>
+        /// 查询菜单树
+        /// </summary>
+        public async Task<List<MenuDto>> GetMenuTree()
+        {
+            var menus = await ctx.Menus.OrderBy(a => a.SortNo).ToListAsync();
+            return menus.Where(a => a.Parent == null).Select(a => a.Adapt<MenuDto>()).ToList();
+        }
+
+        /// <summary>
         /// 分页查询
         /// </summary>
         public async Task<PageResult<MenuDto>> FindPagedList(MenuQuery query, Pager pager, LoginUser user)
@@ -90,10 +99,13 @@ namespace FeiNuo.Admin.Services.System
         /// </summary>
         public async Task DeleteMenuByIds(IEnumerable<int> ids, LoginUser user)
         {
-            foreach (var id in ids)
+            var menus = await ctx.Menus.Where(a => ids.Contains(a.MenuId)).ToListAsync();
+            if (menus.Count != ids.Count())
             {
-                var menu = await ctx.Menus.FindAsync(id);
-                if (menu == null) throw new MessageException($"不存在【id={id}】的菜单。");
+                throw new MessageException("查询出的数据和传入的ID不匹配，请刷新后再试。");
+            }
+            foreach (var menu in menus)
+            {
                 //TODO 判断是否能删除
                 ctx.Menus.Remove(menu);
             }

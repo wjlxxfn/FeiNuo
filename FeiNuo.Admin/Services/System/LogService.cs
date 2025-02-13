@@ -90,10 +90,13 @@ namespace FeiNuo.Admin.Services.System
         /// </summary>
         public async Task DeleteLogByIds(IEnumerable<long> ids, LoginUser user)
         {
-            foreach (var id in ids)
+            var logs = await ctx.Logs.Where(a => ids.Contains(a.LogId)).ToListAsync();
+            if (logs.Count != ids.Count())
             {
-                var log = await ctx.Logs.FindAsync(id);
-                if (log == null) throw new MessageException($"不存在【id={id}】的操作日志。");
+                throw new MessageException("查询出的数据和传入的ID不匹配，请刷新后再试。");
+            }
+            foreach (var log in logs)
+            {
                 //TODO 判断是否能删除
                 ctx.Logs.Remove(log);
             }

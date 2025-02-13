@@ -91,10 +91,13 @@ namespace <#=cfg.RootNameSpace#>.Services<#= cfg.ModuleName == "" ? "" : ("."+cf
         /// </summary>
         public async Task Delete<#=entityType.Name#>ByIds(IEnumerable<<#=pkPropertyType#>> ids, LoginUser user)
         {
-            foreach (var id in ids)
+            var <#=buProperty.Pluralize()#> = await ctx.<#= dbSetName #>.Where(a => ids.Contains(a.<#=pkColumn.Name#>)).ToListAsync();
+            if (<#=buProperty.Pluralize()#>.Count != ids.Count())
             {
-                var <#=buProperty#> = await ctx.<#= dbSetName #>.FindAsync(id);
-                if (<#=buProperty#> == null) throw new MessageException($"不存在【id={id}】的<#=tableComment#>。");
+                throw new MessageException("查询出的数据和传入的ID不匹配，请刷新后再试。");
+            }
+            foreach (var <#=buProperty#> in <#=buProperty.Pluralize()#>)
+            {
                 //TODO 判断是否能删除
                 ctx.<#= dbSetName #>.Remove(<#=buProperty#>);
             }

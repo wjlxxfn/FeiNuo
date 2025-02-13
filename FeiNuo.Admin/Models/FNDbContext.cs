@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 
+
 namespace FeiNuo.Admin.Models;
 
 public partial class FNDbContext : DbContext

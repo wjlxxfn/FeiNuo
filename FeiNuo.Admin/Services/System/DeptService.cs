@@ -90,10 +90,13 @@ namespace FeiNuo.Admin.Services.System
         /// </summary>
         public async Task DeleteDeptByIds(IEnumerable<int> ids, LoginUser user)
         {
-            foreach (var id in ids)
+            var depts = await ctx.Depts.Where(a => ids.Contains(a.DeptId)).ToListAsync();
+            if (depts.Count != ids.Count())
             {
-                var dept = await ctx.Depts.FindAsync(id);
-                if (dept == null) throw new MessageException($"不存在【id={id}】的部门。");
+                throw new MessageException("查询出的数据和传入的ID不匹配，请刷新后再试。");
+            }
+            foreach (var dept in depts)
+            {
                 //TODO 判断是否能删除
                 ctx.Depts.Remove(dept);
             }

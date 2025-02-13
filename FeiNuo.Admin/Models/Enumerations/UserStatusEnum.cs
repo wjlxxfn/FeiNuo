@@ -8,17 +8,17 @@ public enum UserStatusEnum
     /// 正常
     /// </summary>
     [Description("正常")]
-    Normal = 1010,
+    Normal = 0,
 
     /// <summary>
     /// 锁定
     /// </summary>
     [Description("锁定")]
-    Locked = 1011,
+    Locked = 1,
 
     /// <summary>
     /// 密码过期
     /// </summary>
     [Description("密码过期")]
-    Expired = 1012,
+    Expired = 2,
 }

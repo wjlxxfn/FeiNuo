@@ -47,10 +47,10 @@ namespace FeiNuo.Admin.Controllers.System
             var excel = new ExcelConfig($"角色导出{DateTime.Now:yyyyMMddHHmmss}.xlsx", pager.DataList, [
                 new ExcelColumn<RoleDto>("角色编码", d => d.RoleCode, 15),
                 new ExcelColumn<RoleDto>("角色名称", d => d.RoleName, 15),
-                new ExcelColumn<RoleDto>("是否作废", d => d.Disabled, 15),
-                new ExcelColumn<RoleDto>("备注说明", d => d.Remark, 15),
+                new ExcelColumn<RoleDto>("角色状态", d => d.Disabled?"作废":"正常", 10),
+                new ExcelColumn<RoleDto>("备注说明", d => d.Remark, 25),
                 new ExcelColumn<RoleDto>("创建人", d => d.CreateBy, 15),
-                new ExcelColumn<RoleDto>("创建时间", d => d.CreateTime, 15),
+                new ExcelColumn<RoleDto>("创建时间", d => d.CreateTime, 12),
             ]);
             var bytes = PoiHelper.GetExcelBytes(excel);
             return File(bytes, excel.ContentType, excel.FileName);
@@ -96,6 +96,29 @@ namespace FeiNuo.Admin.Controllers.System
                 return ErrorMessage("参数错误：没有接收到要删除的主键值");
             }
             await service.DeleteRoleByIds(ids, CurrentUser);
+            return NoContent();
+        }
+
+        /// <summary>
+        /// 修改角色状态
+        /// </summary>
+        [HttpPatch("{roleId}/status/{status}")]
+        [Log("修改角色状态", OperateType.Update)]
+        public async Task<ActionResult> UpdateRoleStatus(int roleId, int status)
+        {
+            var disabled = status == 1;
+            await service.UpdateRoleStatus(roleId, disabled, CurrentUser);
+            return NoContent();
+        }
+
+        /// <summary>
+        /// 修改角色权限
+        /// </summary>
+        [HttpPatch("{roleId}/menus")]
+        [Log("修改角色权限", OperateType.Update)]
+        public async Task<ActionResult> UpdateRoleMenus(int roleId, [FromBody] int[] menuIds)
+        {
+            await service.UpdateRoleMenus(roleId, menuIds, CurrentUser);
             return NoContent();
         }
         #endregion

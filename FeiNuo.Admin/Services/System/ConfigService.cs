@@ -1,6 +1,7 @@
 using FeiNuo.Admin.Models;
 using Mapster;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace FeiNuo.Admin.Services.System
 {
@@ -11,9 +12,11 @@ namespace FeiNuo.Admin.Services.System
     {
         #region 构造函数
         protected readonly FNDbContext ctx;
-        public ConfigService(FNDbContext ctx) : base(ctx)
+        private readonly IMemoryCache cache;
+        public ConfigService(FNDbContext ctx, IMemoryCache cache) : base(ctx)
         {
             this.ctx = ctx;
+            this.cache = cache;
         }
         #endregion
 
@@ -50,6 +53,8 @@ namespace FeiNuo.Admin.Services.System
             // 执行保存
             ctx.Configs.Add(entity);
             await ctx.SaveChangesAsync();
+            // 清除缓存
+            RemoveCache(entity.ConfigCode);
             // 返回Dto
             return entity.Adapt<ConfigDto>();
         }
@@ -65,6 +70,8 @@ namespace FeiNuo.Admin.Services.System
             await CopyDtoToEntity(dto, entity, user, false);
             // 执行更新
             await ctx.SaveChangesAsync();
+            // 清除缓存
+            RemoveCache(entity.ConfigCode);
         }
 
         /// <summary>
@@ -72,8 +79,8 @@ namespace FeiNuo.Admin.Services.System
         /// </summary>
         private async Task CopyDtoToEntity(ConfigDto dto, ConfigEntity entity, LoginUser user, bool isNew)
         {
-            //TODO 检查数据重复
-            if (await ctx.Configs.AnyAsync(a => a.ConfigId != dto.ConfigId /* && (a.Name == dto.Name )*/))
+            // 检查数据重复
+            if (await ctx.Configs.AnyAsync(a => a.ConfigId != dto.ConfigId && (a.ConfigName == dto.ConfigName || a.ConfigCode == dto.ConfigCode)))
             {
                 throw new MessageException("当前已存在相同名称或编码的参数配置");
             }
@@ -90,15 +97,61 @@ namespace FeiNuo.Admin.Services.System
         /// </summary>
         public async Task DeleteConfigByIds(IEnumerable<int> ids, LoginUser user)
         {
-            foreach (var id in ids)
+            var configs = await ctx.Configs.Where(a => ids.Contains(a.ConfigId)).ToListAsync();
+            if (configs.Count != ids.Count())
             {
-                var config = await ctx.Configs.FindAsync(id);
-                if (config == null) throw new MessageException($"不存在【id={id}】的参数配置。");
-                //TODO 判断是否能删除
+                throw new MessageException("查询出的数据和传入的ID不匹配，请刷新后再试。");
+            }
+            foreach (var config in configs)
+            {
+                // 清除缓存
+                RemoveCache(config.ConfigCode);
                 ctx.Configs.Remove(config);
             }
             // 提交事务
             await ctx.SaveChangesAsync();
+        }
+
+
+        private void RemoveCache(string key)
+        {
+            if (!string.IsNullOrWhiteSpace(key))
+            {
+                cache.Remove(AppConstants.CACHE_PREFIX_CONFIG + key);
+            }
+        }
+        #endregion
+
+        #region 查询配置值
+        public async Task<ConfigDto?> GetConfigByCode(string configCode)
+        {
+            return await cache.GetOrCreateAsync(AppConstants.CACHE_PREFIX_CONFIG + configCode, async o =>
+            {
+                o.SlidingExpiration = TimeSpan.FromHours(4);
+                var cfg = await ctx.Configs.SingleOrDefaultAsync(a => a.ConfigCode == configCode);
+                return cfg?.Adapt<ConfigDto>();
+            });
+        }
+        public async Task<string> GetConfigValue(string configCode, string defaultValue = "")
+        {
+            var dto = await GetConfigByCode(configCode);
+            return null == dto ? defaultValue : dto.ConfigValue;
+        }
+        public async Task<int> GetConfigValueInteger(string configCode, int defaultValue = 0)
+        {
+            var dto = await GetConfigByCode(configCode);
+            return (null == dto || string.IsNullOrWhiteSpace(dto.ConfigValue)) ? defaultValue : int.Parse(dto.ConfigValue);
+        }
+        public async Task<decimal> GetConfigValueDecimal(string configCode, decimal defaultValue = 0)
+        {
+            var dto = await GetConfigByCode(configCode);
+            return (null == dto || string.IsNullOrWhiteSpace(dto.ConfigValue)) ? defaultValue : decimal.Parse(dto.ConfigValue);
+        }
+        public async Task<bool> GetConfigValueBoolean(string configCode, bool defaultValue = false)
+        {
+            var dto = await GetConfigByCode(configCode);
+            if (null == dto || string.IsNullOrWhiteSpace(dto.ConfigValue)) return defaultValue;
+            return dto.ConfigValue == "1" || dto.ConfigValue.Trim().Equals("true", StringComparison.CurrentCultureIgnoreCase);
         }
         #endregion
     }
