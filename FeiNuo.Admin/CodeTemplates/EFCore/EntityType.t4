@@ -186,7 +186,7 @@ public partial class <#= EntityType.Name #>Configuration : IEntityTypeConfigurat
                     usings.AddRange(keyFluentApiCalls.GetRequiredUsings());
                 }
 #>
-        entity.HasKey(<#= code.Lambda(key.Properties, "e") #>)<#= code.Fragment(keyFluentApiCalls, indent: 3) #>;
+        entity.HasKey(<#= code.Lambda(key.Properties, "e") #>)<#= code.Fragment(keyFluentApiCalls, indent: 3).Replace("PRIMARY","pk_"+EntityType.GetTableName()) #>;
 <#
                 anyEntityTypeConfiguration = true;
             }
@@ -308,9 +308,9 @@ public partial class <#= EntityType.Name #>Configuration : IEntityTypeConfigurat
             }
 #>
         entity.HasMany(d => d.<#= skipNavigation.Name #>).WithMany(p => p.<#= skipNavigation.Inverse.Name #>)
-            .UsingEntity<Dictionary<string, object>>(<#= code.Literal(joinEntityType.Name) #>,
-                r => r.HasOne<<#= right.PrincipalEntityType.Name #>Entity>().WithMany()<#= code.Fragment(rightFluentApiCalls, indent: 6) #>,
-                l => l.HasOne<<#= left.PrincipalEntityType.Name #>Entity>().WithMany()<#= code.Fragment(leftFluentApiCalls, indent: 6) #>,
+            .UsingEntity(<#= code.Literal(joinEntityType.Name) #>,
+                r => r.HasOne(typeof(<#= right.PrincipalEntityType.Name #>Entity)).WithMany()<#= code.Fragment(rightFluentApiCalls, indent: 6) #>,
+                l => l.HasOne(typeof(<#= left.PrincipalEntityType.Name #>Entity)).WithMany()<#= code.Fragment(leftFluentApiCalls, indent: 6) #>,
                 j =>
                 {
 <#
@@ -322,7 +322,7 @@ public partial class <#= EntityType.Name #>Configuration : IEntityTypeConfigurat
                 usings.AddRange(joinKeyFluentApiCalls.GetRequiredUsings());
             }
 #>
-                    j.HasKey(<#= code.Arguments(joinKey.Properties.Select(e => e.Name)) #>)<#= code.Fragment(joinKeyFluentApiCalls, indent: 7) #>;
+                    j.HasKey(<#= code.Arguments(joinKey.Properties.Select(e => e.Name)) #>)<#= code.Fragment(joinKeyFluentApiCalls, indent: 0).Replace("\r\n","") #>;
 <#
             var joinEntityTypeFluentApiCalls = joinEntityType.GetFluentApiCalls(annotationCodeGenerator);
             if (joinEntityTypeFluentApiCalls != null)
@@ -330,6 +330,19 @@ public partial class <#= EntityType.Name #>Configuration : IEntityTypeConfigurat
                 usings.AddRange(joinEntityTypeFluentApiCalls.GetRequiredUsings());
 #>
                     j<#= code.Fragment(joinEntityTypeFluentApiCalls, indent: 7) #>;
+<#
+            }
+            foreach (var property in joinEntityType.GetProperties())
+            {
+                var propertyFluentApiCalls = property.GetFluentApiCalls(annotationCodeGenerator);
+                if (propertyFluentApiCalls == null)
+                {
+                    continue;
+                }
+
+                usings.AddRange(propertyFluentApiCalls.GetRequiredUsings());
+#>
+                    j.IndexerProperty<<#= code.Reference(property.ClrType) #>>(<#= code.Literal(property.Name) #>)<#= code.Fragment(propertyFluentApiCalls, indent: 0).Replace("\r\n","") #>;
 <#
             }
 #>

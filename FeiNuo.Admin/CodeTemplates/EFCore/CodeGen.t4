@@ -17,7 +17,7 @@
         ExcludeTables = new string[]{"sys_role_menu","sys_user_role"  },
         ModuleName = "System", // 模块名，路径里使用{moduleName}
 
-        GenCode = true, //是否生成代码，false的话默认只生成model，这个文件里的项目就不生成
+        GenCode = false, //是否生成代码，false的话默认只生成model，这个文件里的项目就不生成
         Override = true, //覆盖生成
 
         Dto        = new { Gen = false, FullName = "Services/{moduleName}/Dtos/{entityName}Dto.cs" },

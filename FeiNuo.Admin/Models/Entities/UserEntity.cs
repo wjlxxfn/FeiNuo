@@ -119,12 +119,12 @@ public partial class UserConfiguration : IEntityTypeConfiguration<UserEntity>
             .HasConstraintName("fk_sys_user_dept_id");
 
         entity.HasMany(d => d.Roles).WithMany(p => p.Users)
-            .UsingEntity<Dictionary<string, object>>("UserRole",
-                r => r.HasOne<RoleEntity>().WithMany()
+            .UsingEntity("UserRole",
+                r => r.HasOne(typeof(RoleEntity)).WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.ClientSetNull)
                         .HasConstraintName("fk_sys_user_role_role_id"),
-                l => l.HasOne<UserEntity>().WithMany()
+                l => l.HasOne(typeof(UserEntity)).WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.ClientSetNull)
                         .HasConstraintName("fk_sys_user_role_user_id"),
@@ -132,6 +132,8 @@ public partial class UserConfiguration : IEntityTypeConfiguration<UserEntity>
                 {
                     j.HasKey("UserId", "RoleId").HasName("pk_sys_user_role");
                     j.ToTable("sys_user_role", tb => tb.HasComment("用户角色关联表"));
+                    j.IndexerProperty<int>("UserId").HasComment("用户ID").HasColumnName("user_id");
+                    j.IndexerProperty<int>("RoleId").HasComment("角色ID").HasColumnName("role_id");
                 });
 
         OnConfigurePartial(entity);

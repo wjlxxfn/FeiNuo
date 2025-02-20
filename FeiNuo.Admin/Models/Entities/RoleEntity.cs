@@ -62,12 +62,12 @@ public partial class RoleConfiguration : IEntityTypeConfiguration<RoleEntity>
         entity.Property(e => e.UpdateTime).HasColumnName("update_time").HasComment("修改时间");
 
         entity.HasMany(d => d.Menus).WithMany(p => p.Roles)
-            .UsingEntity<Dictionary<string, object>>("RoleMenu",
-                r => r.HasOne<MenuEntity>().WithMany()
+            .UsingEntity("RoleMenu",
+                r => r.HasOne(typeof(MenuEntity)).WithMany()
                         .HasForeignKey("MenuId")
                         .OnDelete(DeleteBehavior.ClientSetNull)
                         .HasConstraintName("fk_sys_role_menu_menu_id"),
-                l => l.HasOne<RoleEntity>().WithMany()
+                l => l.HasOne(typeof(RoleEntity)).WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.ClientSetNull)
                         .HasConstraintName("fk_sys_role_menu_role_id"),
@@ -75,6 +75,8 @@ public partial class RoleConfiguration : IEntityTypeConfiguration<RoleEntity>
                 {
                     j.HasKey("RoleId", "MenuId").HasName("pk_sys_role_menu");
                     j.ToTable("sys_role_menu", tb => tb.HasComment("角色菜单关联表"));
+                    j.IndexerProperty<int>("RoleId").HasComment("角色ID").HasColumnName("role_id");
+                    j.IndexerProperty<int>("MenuId").HasComment("菜单ID").HasColumnName("menu_id");
                 });
 
         OnConfigurePartial(entity);
