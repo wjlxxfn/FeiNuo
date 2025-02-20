@@ -95,10 +95,10 @@ namespace FeiNuo.Admin.Services.System
             {
                 throw new MessageException("查询出的数据和传入的ID不匹配，请刷新后再试。");
             }
-            foreach (var user in users)
+            foreach (var u in users)
             {
                 //TODO 判断是否能删除
-                ctx.Users.Remove(user);
+                ctx.Users.Remove(u);
             }
             // 提交事务
             await ctx.SaveChangesAsync();
