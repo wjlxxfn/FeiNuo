@@ -1,5 +1,6 @@
 using FeiNuo.Admin.Models;
 using Mapster;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
 namespace FeiNuo.Admin.Services.System
@@ -23,11 +24,13 @@ namespace FeiNuo.Admin.Services.System
         /// <summary>
         /// 角色ID
         /// </summary>
+        [Description("角色ID")]
         public int RoleId { get; set; }
 
         /// <summary>
         /// 角色编码
         /// </summary>
+        [Description("角色编码")]
         [Required(ErrorMessage = "【角色编码】不能为空")]
         [StringLength(50, ErrorMessage = "【角色编码】长度不能超过 50。")]
         public string RoleCode { get; set; } = null!;
@@ -35,6 +38,7 @@ namespace FeiNuo.Admin.Services.System
         /// <summary>
         /// 角色名称
         /// </summary>
+        [Description("角色名称")]
         [Required(ErrorMessage = "【角色名称】不能为空")]
         [StringLength(50, ErrorMessage = "【角色名称】长度不能超过 50。")]
         public string RoleName { get; set; } = null!;
@@ -42,17 +46,20 @@ namespace FeiNuo.Admin.Services.System
         /// <summary>
         /// 是否作废
         /// </summary>
+        [Description("是否作废")]
         public bool Disabled { get; set; }
 
         /// <summary>
         /// 备注说明
         /// </summary>
+        [Description("备注说明")]
         [StringLength(200, ErrorMessage = "【备注说明】长度不能超过 200。")]
         public string? Remark { get; set; }
 
         /// <summary>
         /// 菜单ID
         /// </summary>
+		[Description("菜单ID")]
         public IEnumerable<int> MenuIds { get; set; } = Enumerable.Empty<int>();
 
     }

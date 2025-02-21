@@ -22,6 +22,7 @@ namespace FeiNuo.Admin.Controllers.System
         /// 分页查询
         /// </summary>
         [HttpGet]
+        [EndpointSummary("分页查询")]
         public async Task<PageResult<RoleDto>> GetRoleList([FromQuery] RoleQuery query, [FromQuery] Pager pager)
         {
             return await service.FindPagedList(query, pager, CurrentUser);
@@ -32,6 +33,7 @@ namespace FeiNuo.Admin.Controllers.System
         /// </summary>
         /// <param name="roleId">主键ID</param>
         [HttpGet("{roleId}")]
+        [EndpointSummary("主键查询")]
         public async Task<RoleDto> GetRole(int roleId)
         {
             return await service.GetRole(roleId);
@@ -41,6 +43,7 @@ namespace FeiNuo.Admin.Controllers.System
         /// 导出Excel
         /// </summary>
         [HttpGet("export")]
+        [EndpointSummary("导出Excel")]
         public async Task<ActionResult> ExportRoles([FromQuery] RoleQuery query)
         {
             var pager = await service.FindPagedList(query, Pager.Unpaged, CurrentUser);
@@ -62,6 +65,7 @@ namespace FeiNuo.Admin.Controllers.System
         /// 新增角色
         /// </summary>
         [HttpPost]
+        [EndpointSummary("新增角色")]
         [Log("新增角色", OperateType.Create, false, true)]
         public async Task<ActionResult<RoleDto>> CreateRole([FromBody] RoleDto dto)
         {
@@ -73,6 +77,7 @@ namespace FeiNuo.Admin.Controllers.System
         /// 修改角色
         /// </summary>
         [HttpPut("{id}")]
+        [EndpointSummary("修改角色")]
         [Log("修改角色", OperateType.Update)]
         public async Task<ActionResult> UpdateRole(int id, [FromBody] RoleDto dto)
         {
@@ -88,6 +93,7 @@ namespace FeiNuo.Admin.Controllers.System
         /// 删除角色
         /// </summary>
         [HttpDelete]
+        [EndpointSummary("删除角色")]
         [Log("删除角色", OperateType.Delete)]
         public async Task<ActionResult> DeleteRoleByIds([FromQuery] int[] ids)
         {

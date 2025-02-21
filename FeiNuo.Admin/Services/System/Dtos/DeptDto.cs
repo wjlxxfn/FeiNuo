@@ -1,4 +1,5 @@
 using FeiNuo.Admin.Models;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
 namespace FeiNuo.Admin.Services.System
@@ -22,16 +23,19 @@ namespace FeiNuo.Admin.Services.System
         /// <summary>
         /// 部门ID
         /// </summary>
+        [Description("部门ID")]
         public int DeptId { get; set; }
 
         /// <summary>
         /// 上级ID
         /// </summary>
+        [Description("上级ID")]
         public int? ParentId { get; set; }
 
         /// <summary>
         /// 部门名称
         /// </summary>
+        [Description("部门名称")]
         [Required(ErrorMessage = "【部门名称】不能为空")]
         [StringLength(50, ErrorMessage = "【部门名称】长度不能超过 50。")]
         public string DeptName { get; set; } = null!;
@@ -39,16 +43,19 @@ namespace FeiNuo.Admin.Services.System
         /// <summary>
         /// 排序号
         /// </summary>
+        [Description("排序号")]
         public short SortNo { get; set; }
 
         /// <summary>
         /// 是否作废
         /// </summary>
+        [Description("是否作废")]
         public bool Disabled { get; set; }
 
         /// <summary>
         /// 备注说明
         /// </summary>
+        [Description("备注说明")]
         [StringLength(200, ErrorMessage = "【备注说明】长度不能超过 200。")]
         public string? Remark { get; set; }
 

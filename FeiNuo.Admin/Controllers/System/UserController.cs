@@ -22,6 +22,7 @@ namespace FeiNuo.Admin.Controllers.System
         /// 分页查询
         /// </summary>
         [HttpGet]
+        [EndpointSummary("分页查询")]
         public async Task<PageResult<UserDto>> GetUserList([FromQuery] UserQuery query, [FromQuery] Pager pager)
         {
             return await service.FindPagedList(query, pager, CurrentUser);
@@ -32,6 +33,7 @@ namespace FeiNuo.Admin.Controllers.System
         /// </summary>
         /// <param name="userId">主键ID</param>
         [HttpGet("{userId}")]
+        [EndpointSummary("主键查询")]
         public async Task<UserDto> GetUser(int userId)
         {
             return await service.GetUser(userId);
@@ -41,6 +43,7 @@ namespace FeiNuo.Admin.Controllers.System
         /// 导出Excel
         /// </summary>
         [HttpGet("export")]
+        [EndpointSummary("导出Excel")]
         public async Task<ActionResult> ExportUsers([FromQuery] UserQuery query)
         {
             var pager = await service.FindPagedList(query, Pager.Unpaged, CurrentUser);
@@ -70,6 +73,7 @@ namespace FeiNuo.Admin.Controllers.System
         /// 新增用户
         /// </summary>
         [HttpPost]
+        [EndpointSummary("新增用户")]
         [Log("新增用户", OperateType.Create, false, true)]
         public async Task<ActionResult<UserDto>> CreateUser([FromBody] UserDto dto)
         {
@@ -81,6 +85,7 @@ namespace FeiNuo.Admin.Controllers.System
         /// 修改用户
         /// </summary>
         [HttpPut("{id}")]
+        [EndpointSummary("修改用户")]
         [Log("修改用户", OperateType.Update)]
         public async Task<ActionResult> UpdateUser(int id, [FromBody] UserDto dto)
         {
@@ -96,6 +101,7 @@ namespace FeiNuo.Admin.Controllers.System
         /// 删除用户
         /// </summary>
         [HttpDelete]
+        [EndpointSummary("删除用户")]
         [Log("删除用户", OperateType.Delete)]
         public async Task<ActionResult> DeleteUserByIds([FromQuery] int[] ids)
         {

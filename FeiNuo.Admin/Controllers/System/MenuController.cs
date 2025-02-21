@@ -22,7 +22,8 @@ namespace FeiNuo.Admin.Controllers.System
         /// 查询菜单树
         /// </summary>
         [HttpGet("tree")]
-        public async Task<List<MenuDto>> GetMenuTree()
+        [EndpointSummary("查询菜单树")]
+		public async Task<List<MenuDto>> GetMenuTree()
         {
             return await service.GetMenuTree();
         }
@@ -31,6 +32,7 @@ namespace FeiNuo.Admin.Controllers.System
         /// 分页查询
         /// </summary>
         [HttpGet]
+        [EndpointSummary("分页查询")]
         public async Task<PageResult<MenuDto>> GetMenuList([FromQuery] MenuQuery query, [FromQuery] Pager pager)
         {
             return await service.FindPagedList(query, pager, CurrentUser);
@@ -41,6 +43,7 @@ namespace FeiNuo.Admin.Controllers.System
         /// </summary>
         /// <param name="menuId">主键ID</param>
         [HttpGet("{menuId}")]
+        [EndpointSummary("主键查询")]
         public async Task<MenuDto> GetMenu(int menuId)
         {
             return await service.GetMenu(menuId);
@@ -50,6 +53,7 @@ namespace FeiNuo.Admin.Controllers.System
         /// 导出Excel
         /// </summary>
         [HttpGet("export")]
+        [EndpointSummary("导出Excel")]
         public async Task<ActionResult> ExportMenus([FromQuery] MenuQuery query)
         {
             var pager = await service.FindPagedList(query, Pager.Unpaged, CurrentUser);
@@ -75,6 +79,7 @@ namespace FeiNuo.Admin.Controllers.System
         /// 新增菜单
         /// </summary>
         [HttpPost]
+        [EndpointSummary("新增菜单")]
         [Log("新增菜单", OperateType.Create, false, true)]
         public async Task<ActionResult<MenuDto>> CreateMenu([FromBody] MenuDto dto)
         {
@@ -86,6 +91,7 @@ namespace FeiNuo.Admin.Controllers.System
         /// 修改菜单
         /// </summary>
         [HttpPut("{id}")]
+        [EndpointSummary("修改菜单")]
         [Log("修改菜单", OperateType.Update)]
         public async Task<ActionResult> UpdateMenu(int id, [FromBody] MenuDto dto)
         {
@@ -101,6 +107,7 @@ namespace FeiNuo.Admin.Controllers.System
         /// 删除菜单
         /// </summary>
         [HttpDelete]
+        [EndpointSummary("删除菜单")]
         [Log("删除菜单", OperateType.Delete)]
         public async Task<ActionResult> DeleteMenuByIds([FromQuery] int[] ids)
         {

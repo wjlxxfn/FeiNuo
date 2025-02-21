@@ -22,6 +22,7 @@ namespace FeiNuo.Admin.Controllers.System
         /// 分页查询
         /// </summary>
         [HttpGet]
+        [EndpointSummary("分页查询")]
         public async Task<PageResult<DeptDto>> GetDeptList([FromQuery] DeptQuery query, [FromQuery] Pager pager)
         {
             return await service.FindPagedList(query, pager, CurrentUser);
@@ -32,6 +33,7 @@ namespace FeiNuo.Admin.Controllers.System
         /// </summary>
         /// <param name="deptId">主键ID</param>
         [HttpGet("{deptId}")]
+        [EndpointSummary("主键查询")]
         public async Task<DeptDto> GetDept(int deptId)
         {
             return await service.GetDept(deptId);
@@ -41,6 +43,7 @@ namespace FeiNuo.Admin.Controllers.System
         /// 导出Excel
         /// </summary>
         [HttpGet("export")]
+        [EndpointSummary("导出Excel")]
         public async Task<ActionResult> ExportDepts([FromQuery] DeptQuery query)
         {
             var pager = await service.FindPagedList(query, Pager.Unpaged, CurrentUser);
@@ -63,6 +66,7 @@ namespace FeiNuo.Admin.Controllers.System
         /// 新增部门
         /// </summary>
         [HttpPost]
+        [EndpointSummary("新增部门")]
         [Log("新增部门", OperateType.Create, false, true)]
         public async Task<ActionResult<DeptDto>> CreateDept([FromBody] DeptDto dto)
         {
@@ -74,6 +78,7 @@ namespace FeiNuo.Admin.Controllers.System
         /// 修改部门
         /// </summary>
         [HttpPut("{id}")]
+        [EndpointSummary("修改部门")]
         [Log("修改部门", OperateType.Update)]
         public async Task<ActionResult> UpdateDept(int id, [FromBody] DeptDto dto)
         {
@@ -89,6 +94,7 @@ namespace FeiNuo.Admin.Controllers.System
         /// 删除部门
         /// </summary>
         [HttpDelete]
+        [EndpointSummary("删除部门")]
         [Log("删除部门", OperateType.Delete)]
         public async Task<ActionResult> DeleteDeptByIds([FromQuery] int[] ids)
         {

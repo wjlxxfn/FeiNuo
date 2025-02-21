@@ -1,5 +1,6 @@
 using FeiNuo.Admin.Models;
 using Mapster;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
 namespace FeiNuo.Admin.Services.System
@@ -23,16 +24,19 @@ namespace FeiNuo.Admin.Services.System
         /// <summary>
         /// 菜单ID
         /// </summary>
+        [Description("菜单ID")]
         public int MenuId { get; set; }
 
         /// <summary>
         /// 上级ID
         /// </summary>
+        [Description("上级ID")]
         public int? ParentId { get; set; }
 
         /// <summary>
         /// 菜单名称
         /// </summary>
+        [Description("菜单名称")]
         [Required(ErrorMessage = "【菜单名称】不能为空")]
         [StringLength(50, ErrorMessage = "【菜单名称】长度不能超过 50。")]
         public string MenuName { get; set; } = null!;
@@ -40,11 +44,13 @@ namespace FeiNuo.Admin.Services.System
         /// <summary>
         /// 菜单类型
         /// </summary>
+        [Description("菜单类型")]
         public int MenuType { get; set; }
 
         /// <summary>
         /// 菜单地址
         /// </summary>
+        [Description("菜单地址")]
         [Required(ErrorMessage = "【菜单地址】不能为空")]
         [StringLength(200, ErrorMessage = "【菜单地址】长度不能超过 200。")]
         public string MenuPath { get; set; } = null!;
@@ -52,6 +58,7 @@ namespace FeiNuo.Admin.Services.System
         /// <summary>
         /// 权限标识
         /// </summary>
+        [Description("权限标识")]
         [Required(ErrorMessage = "【权限标识】不能为空")]
         [StringLength(200, ErrorMessage = "【权限标识】长度不能超过 200。")]
         public string Permission { get; set; } = null!;
@@ -59,23 +66,27 @@ namespace FeiNuo.Admin.Services.System
         /// <summary>
         /// 排序号
         /// </summary>
+        [Description("排序号")]
         public short SortNo { get; set; }
 
         /// <summary>
         /// 菜单图标
         /// </summary>
+        [Description("菜单图标")]
         [StringLength(500, ErrorMessage = "【菜单图标】长度不能超过 500。")]
         public string? Icon { get; set; }
 
         /// <summary>
         /// 备注说明
         /// </summary>
+        [Description("备注说明")]
         [StringLength(200, ErrorMessage = "【备注说明】长度不能超过 200。")]
         public string? Remark { get; set; }
 
         /// <summary>
         /// 下级菜单
         /// </summary>
+		[Description("下级菜单")]
         public List<MenuDto>? Children { get; set; }
     }
     #endregion

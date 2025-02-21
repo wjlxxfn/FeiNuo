@@ -1,4 +1,5 @@
 using FeiNuo.Admin.Models;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
 namespace FeiNuo.Admin.Services.System
@@ -22,11 +23,13 @@ namespace FeiNuo.Admin.Services.System
         /// <summary>
         /// 参数配置ID
         /// </summary>
+        [Description("参数配置ID")]
         public int ConfigId { get; set; }
 
         /// <summary>
         /// 参数编码
         /// </summary>
+        [Description("参数编码")]
         [Required(ErrorMessage = "【参数编码】不能为空")]
         [StringLength(100, ErrorMessage = "【参数编码】长度不能超过 100。")]
         public string ConfigCode { get; set; } = null!;
@@ -34,6 +37,7 @@ namespace FeiNuo.Admin.Services.System
         /// <summary>
         /// 参数名称
         /// </summary>
+        [Description("参数名称")]
         [Required(ErrorMessage = "【参数名称】不能为空")]
         [StringLength(50, ErrorMessage = "【参数名称】长度不能超过 50。")]
         public string ConfigName { get; set; } = null!;
@@ -41,6 +45,7 @@ namespace FeiNuo.Admin.Services.System
         /// <summary>
         /// 配置内容
         /// </summary>
+        [Description("配置内容")]
         [Required(ErrorMessage = "【配置内容】不能为空")]
         [StringLength(500, ErrorMessage = "【配置内容】长度不能超过 500。")]
         public string ConfigValue { get; set; } = null!;
@@ -48,12 +53,14 @@ namespace FeiNuo.Admin.Services.System
         /// <summary>
         /// 其他配置
         /// </summary>
+        [Description("其他配置")]
         [StringLength(500, ErrorMessage = "【其他配置】长度不能超过 500。")]
         public string? ExtraValue { get; set; }
 
         /// <summary>
         /// 备注说明
         /// </summary>
+        [Description("备注说明")]
         [StringLength(200, ErrorMessage = "【备注说明】长度不能超过 200。")]
         public string? Remark { get; set; }
 

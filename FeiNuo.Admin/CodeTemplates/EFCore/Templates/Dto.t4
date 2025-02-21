@@ -1,4 +1,5 @@
 ﻿using <#=Options.ModelNamespace#>;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
 namespace <#=cfg.RootNameSpace#>.Services<#= cfg.ModuleName == "" ? "" : ("."+cfg.ModuleName)#>
@@ -32,6 +33,7 @@ namespace <#=cfg.RootNameSpace#>.Services<#= cfg.ModuleName == "" ? "" : ("."+cf
         /// <summary>
         /// <#= colComment #>
         /// </summary>
+        [Description("<#= colComment #>")]
 <#  if(!property.IsNullable  && !property.ClrType.IsValueType && needVadation) { #>
         [Required(ErrorMessage = "【<#= colComment #>】不能为空")]
 <#  } if(code.Reference(property.ClrType)=="string" &&!isMaxType  && needVadation) { #>

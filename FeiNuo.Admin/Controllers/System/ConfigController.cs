@@ -22,6 +22,7 @@ namespace FeiNuo.Admin.Controllers.System
         /// 分页查询
         /// </summary>
         [HttpGet]
+        [EndpointSummary("分页查询")]
         public async Task<PageResult<ConfigDto>> GetConfigList([FromQuery] ConfigQuery query, [FromQuery] Pager pager)
         {
             return await service.FindPagedList(query, pager, CurrentUser);
@@ -32,6 +33,7 @@ namespace FeiNuo.Admin.Controllers.System
         /// </summary>
         /// <param name="configId">主键ID</param>
         [HttpGet("{configId}")]
+        [EndpointSummary("主键查询")]
         public async Task<ConfigDto> GetConfig(int configId)
         {
             return await service.GetConfig(configId);
@@ -41,6 +43,7 @@ namespace FeiNuo.Admin.Controllers.System
         /// 导出Excel
         /// </summary>
         [HttpGet("export")]
+        [EndpointSummary("导出Excel")]
         public async Task<ActionResult> ExportConfigs([FromQuery] ConfigQuery query)
         {
             var pager = await service.FindPagedList(query, Pager.Unpaged, CurrentUser);
@@ -63,6 +66,7 @@ namespace FeiNuo.Admin.Controllers.System
         /// 新增参数配置
         /// </summary>
         [HttpPost]
+        [EndpointSummary("新增参数配置")]
         [Log("新增参数配置", OperateType.Create, false, true)]
         public async Task<ActionResult<ConfigDto>> CreateConfig([FromBody] ConfigDto dto)
         {
@@ -74,6 +78,7 @@ namespace FeiNuo.Admin.Controllers.System
         /// 修改参数配置
         /// </summary>
         [HttpPut("{id}")]
+        [EndpointSummary("修改参数配置")]
         [Log("修改参数配置", OperateType.Update)]
         public async Task<ActionResult> UpdateConfig(int id, [FromBody] ConfigDto dto)
         {
@@ -89,6 +94,7 @@ namespace FeiNuo.Admin.Controllers.System
         /// 删除参数配置
         /// </summary>
         [HttpDelete]
+        [EndpointSummary("删除参数配置")]
         [Log("删除参数配置", OperateType.Delete)]
         public async Task<ActionResult> DeleteConfigByIds([FromQuery] int[] ids)
         {

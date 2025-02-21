@@ -22,6 +22,7 @@ namespace <#=cfg.RootNameSpace#>.Controllers<#= cfg.ModuleName == "" ? "" : ("."
         /// 分页查询
         /// </summary>
         [HttpGet]
+        [EndpointSummary("分页查询")]
         public async Task<PageResult<<#=entityName#>Dto>> Get<#=entityName#>List([FromQuery] <#=entityName#>Query query, [FromQuery] Pager pager)
         {
             return await service.FindPagedList(query, pager, CurrentUser);
@@ -32,6 +33,7 @@ namespace <#=cfg.RootNameSpace#>.Controllers<#= cfg.ModuleName == "" ? "" : ("."
         /// </summary>
         /// <param name="<#=pkProperty#>">主键ID</param>
         [HttpGet("{<#=pkProperty#>}")]
+        [EndpointSummary("主键查询")]
         public async Task<<#=entityName#>Dto> Get<#=entityName#>(<#= pkPropertyType #> <#=pkProperty#>)
         {
             return await service.Get<#=entityName#>(<#=pkProperty#>);
@@ -41,6 +43,7 @@ namespace <#=cfg.RootNameSpace#>.Controllers<#= cfg.ModuleName == "" ? "" : ("."
         /// 导出Excel
         /// </summary>
         [HttpGet("export")]
+        [EndpointSummary("导出Excel")]
         public async Task<ActionResult> Export<#=entityName.Pluralize()#>([FromQuery] <#=entityName#>Query query)
         {
             var pager = await service.FindPagedList(query, Pager.Unpaged, CurrentUser);
@@ -64,6 +67,7 @@ namespace <#=cfg.RootNameSpace#>.Controllers<#= cfg.ModuleName == "" ? "" : ("."
         /// 新增<#=tableComment#>
         /// </summary>
         [HttpPost]
+        [EndpointSummary("新增<#=tableComment#>")]
         [Log("新增<#=tableComment#>", OperateType.Create, false, true)]
         public async Task<ActionResult<<#=entityName#>Dto>> Create<#=entityName#>([FromBody] <#=entityName#>Dto dto)
         {
@@ -75,6 +79,7 @@ namespace <#=cfg.RootNameSpace#>.Controllers<#= cfg.ModuleName == "" ? "" : ("."
         /// 修改<#=tableComment#>
         /// </summary>
         [HttpPut("{id}")]
+        [EndpointSummary("修改<#=tableComment#>")]
         [Log("修改<#=tableComment#>", OperateType.Update)]
         public async Task<ActionResult> Update<#=entityName#>(<#= pkPropertyType #> id, [FromBody] <#=entityName#>Dto dto)
         {
@@ -90,6 +95,7 @@ namespace <#=cfg.RootNameSpace#>.Controllers<#= cfg.ModuleName == "" ? "" : ("."
         /// 删除<#=tableComment#>
         /// </summary>
         [HttpDelete]
+        [EndpointSummary("删除<#=tableComment#>")]
         [Log("删除<#=tableComment#>", OperateType.Delete)]
         public async Task<ActionResult> Delete<#=entityName#>ByIds([FromQuery] <#= pkPropertyType #>[] ids)
         {

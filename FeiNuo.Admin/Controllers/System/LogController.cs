@@ -22,6 +22,7 @@ namespace FeiNuo.Admin.Controllers.System
         /// 分页查询
         /// </summary>
         [HttpGet]
+        [EndpointSummary("分页查询")]
         public async Task<PageResult<LogDto>> GetLogList([FromQuery] LogQuery query, [FromQuery] Pager pager)
         {
             return await service.FindPagedList(query, pager, CurrentUser);
@@ -32,6 +33,7 @@ namespace FeiNuo.Admin.Controllers.System
         /// </summary>
         /// <param name="logId">主键ID</param>
         [HttpGet("{logId}")]
+        [EndpointSummary("主键查询")]
         public async Task<LogDto> GetLog(long logId)
         {
             return await service.GetLog(logId);
@@ -41,6 +43,7 @@ namespace FeiNuo.Admin.Controllers.System
         /// 导出Excel
         /// </summary>
         [HttpGet("export")]
+        [EndpointSummary("导出Excel")]
         public async Task<ActionResult> ExportLogs([FromQuery] LogQuery query)
         {
             var pager = await service.FindPagedList(query, Pager.Unpaged, CurrentUser);
@@ -69,6 +72,7 @@ namespace FeiNuo.Admin.Controllers.System
         /// 新增操作日志
         /// </summary>
         [HttpPost]
+        [EndpointSummary("新增操作日志")]
         [Log("新增操作日志", OperateType.Create, false, true)]
         public async Task<ActionResult<LogDto>> CreateLog([FromBody] LogDto dto)
         {
@@ -80,6 +84,7 @@ namespace FeiNuo.Admin.Controllers.System
         /// 修改操作日志
         /// </summary>
         [HttpPut("{id}")]
+        [EndpointSummary("修改操作日志")]
         [Log("修改操作日志", OperateType.Update)]
         public async Task<ActionResult> UpdateLog(long id, [FromBody] LogDto dto)
         {
@@ -95,6 +100,7 @@ namespace FeiNuo.Admin.Controllers.System
         /// 删除操作日志
         /// </summary>
         [HttpDelete]
+        [EndpointSummary("删除操作日志")]
         [Log("删除操作日志", OperateType.Delete)]
         public async Task<ActionResult> DeleteLogByIds([FromQuery] long[] ids)
         {
