@@ -1,4 +1,5 @@
 using FeiNuo.Admin.Services.System;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FeiNuo.Admin.Controllers.System
@@ -6,7 +7,8 @@ namespace FeiNuo.Admin.Controllers.System
     /// <summary>
     /// API接口：操作日志
     /// </summary>
-    [Route("api/system/logs")]
+    [Authorize]
+    [Route("api/system/[controller]")]
     public class LogController : BaseController
     {
         #region 构造函数

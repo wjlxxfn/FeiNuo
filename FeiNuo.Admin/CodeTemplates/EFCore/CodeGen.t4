@@ -8,7 +8,7 @@
      *******************************************************************************************************/
      var cfg = new {
         // 代码生成的根路径和命名空间
-        RootPath = @"E:\FeiNuo\ttt\FeiNuo\FeiNuo.Admin",
+        RootPath = @"E:\FeiNuo\FeiNuo\FeiNuo.Admin",
         WebRoot = @"E:\FeiNuo\fn-admin-quasar",
         RootNameSpace = Options.ModelNamespace.Replace(".Models",""),
         // 过滤表,三个条件都满足的才生成
@@ -21,7 +21,7 @@
         Override = true, //覆盖生成
 
         Dto        = new { Gen = false, FullName = "Services/{moduleName}/Dtos/{entityName}Dto.cs" },
-        Service    = new { Gen = true, FullName = "Services/{moduleName}/{entityName}Service.cs" },
+        Service    = new { Gen = false, FullName = "Services/{moduleName}/{entityName}Service.cs" },
         Controller = new { Gen = false, FullName = "Controllers/{moduleName}/{entityName}Controller.cs" },
 
         WebApi     = new { Gen = false, FullName = "src/api/{moduleName}/{entityName}.ts" },
@@ -64,7 +64,6 @@
             File.WriteAllText(fileName, GenerationEnvironment.ToString());
         }
 #>
-
 <# 
         /*********************************生成Service*********************************/
         if(cfg.Service.Gen && (!File.Exists(fileName) || cfg.Override))
@@ -78,8 +77,6 @@
             File.WriteAllText(fileName, GenerationEnvironment.ToString());
         }
 #>
-
-
 <# 
         /*********************************生成Controller*********************************/
         if(cfg.Controller.Gen && (!File.Exists(fileName) || cfg.Override))
@@ -93,7 +90,6 @@
             File.WriteAllText(fileName, GenerationEnvironment.ToString());
         }
 #>
-
 <# 
         /*********************************生成WebApi*********************************/
         if(cfg.WebApi.Gen && (!File.Exists(fileName) || cfg.Override))
@@ -107,8 +103,6 @@
             File.WriteAllText(fileName, GenerationEnvironment.ToString());
         }
 #>
-
-
 <# 
         /*********************************生成WebPage*********************************/
         if(cfg.WebPage.Gen && (!File.Exists(fileName) || cfg.Override))
@@ -122,7 +116,6 @@
             File.WriteAllText(fileName, GenerationEnvironment.ToString());
         }
 #>
-
 <# 
         /*********************************生成WebForm*********************************/
         if(cfg.WebForm.Gen && (!File.Exists(fileName) || cfg.Override))

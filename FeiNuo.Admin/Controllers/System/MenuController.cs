@@ -1,4 +1,5 @@
 using FeiNuo.Admin.Services.System;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FeiNuo.Admin.Controllers.System
@@ -6,7 +7,8 @@ namespace FeiNuo.Admin.Controllers.System
     /// <summary>
     /// API接口：菜单
     /// </summary>
-    [Route("api/system/menus")]
+    [Authorize]
+    [Route("api/system/[controller]")]
     public class MenuController : BaseController
     {
         #region 构造函数
@@ -23,7 +25,7 @@ namespace FeiNuo.Admin.Controllers.System
         /// </summary>
         [HttpGet("tree")]
         [EndpointSummary("查询菜单树")]
-		public async Task<List<MenuDto>> GetMenuTree()
+        public async Task<List<MenuDto>> GetMenuTree()
         {
             return await service.GetMenuTree();
         }

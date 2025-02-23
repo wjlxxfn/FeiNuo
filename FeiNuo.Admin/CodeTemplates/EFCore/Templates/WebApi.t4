@@ -20,7 +20,7 @@
 #>
 }
 
-const baseUrl = '/api/<#= cfg.ModuleName.ToLower() #>/<#=entityName.Pluralize().Camelize()#>';
+const baseUrl = '/api/<#= cfg.ModuleName.ToLower() #>/<#=entityName.Camelize()#>';
 
 /** 查单个 */
 export function get<#=entityName#>(<#=pkProperty#>: IdType): Promise<<#=entityName#>Dto> {
