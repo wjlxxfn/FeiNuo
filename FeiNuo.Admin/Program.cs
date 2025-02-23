@@ -23,7 +23,16 @@ public class Program
             // 注入 Serilog
             builder.Host.UseSerilog((context, services, configuration) =>
             {
-                configuration.ReadFrom.Configuration(context.Configuration).Enrich.FromLogContext();
+                var logBase = "./Logs";
+                configuration.MinimumLevel.Information()
+                    .MinimumLevel.Override("System", LogEventLevel.Warning)
+                    .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+                    .MinimumLevel.Override("Microsoft.Hosting.Lifetime", LogEventLevel.Warning)
+                    .WriteTo.Console(outputTemplate: AppConstants.LOG_FORMAT_CONSOLE)
+                    .WriteTo.Logger(c => c.Filter.ByIncludingOnly(d => d.Level == LogEventLevel.Information).WriteTo.File($"{logBase}/Log-Info-.log", restrictedToMinimumLevel: LogEventLevel.Information, rollingInterval: RollingInterval.Day, outputTemplate: AppConstants.LOG_FORMAT_FILE, fileSizeLimitBytes: 104857600))
+                    .WriteTo.File($"{logBase}/Log-Warning-.log", restrictedToMinimumLevel: LogEventLevel.Warning, rollingInterval: RollingInterval.Day, outputTemplate: AppConstants.LOG_FORMAT_FILE, fileSizeLimitBytes: 104857600)
+                    .ReadFrom.Configuration(context.Configuration)
+                    .Enrich.FromLogContext();
             });
             // 注入 EFCore
             //var conn = builder.Configuration.GetConnectionString("MySql");
@@ -40,17 +49,14 @@ public class Program
                 }
             });
 
-            // 自定义的缓存需要在AddAppServices前注入
-            // builder.Services.AddDistributedMemoryCache();
-
-            // 注入各项服务
-            builder.Services.AddAppServices();
-            builder.Services.AddAppControllers();
             // 注入认证授权
-            builder.Services.AddAppSecurity(builder.Configuration);
+            builder.Services.AddFNAspNetCore(builder.Configuration);
 
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-            builder.Services.AddOpenApi();
+            builder.Services.AddOpenApi(options =>
+            {
+                options.AddDocumentTransformer<BearerSecuritySchemeTransformer>();
+            });
 
             // Mapster，扫描IRegister接口的类，自动配置
             TypeAdapterConfig.GlobalSettings.Scan(Assembly.GetExecutingAssembly());
@@ -58,13 +64,12 @@ public class Program
             var app = builder.Build();
 
             // 接口文档
-            app.MapOpenApi();
+            app.MapOpenApi().RequireAuthorization(AppConstants.AUTH_POLICY_IGNORE);
             app.UseSwaggerUI(options =>
             {
                 options.SwaggerEndpoint("/openapi/v1.json", "v1");
+                options.DocExpansion(Swashbuckle.AspNetCore.SwaggerUI.DocExpansion.None);
             });
-
-
 
             // app.UseHttpsRedirection();
             // app.UseStaticFiles();
