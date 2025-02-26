@@ -124,12 +124,12 @@ public class DbInitializer
             Icon = icon,
         };
         menu.Children = children ?? [];
-        if (type == MenuTypeEnum.Menu && permission != "")
-        {
-            menu.Children.Add(NewMenu(MenuTypeEnum.Button, "新增", $"{permission}.create", 1));
-            menu.Children.Add(NewMenu(MenuTypeEnum.Button, "编辑", $"{permission}.update", 2));
-            menu.Children.Add(NewMenu(MenuTypeEnum.Button, "删除", $"{permission}.delete", 3));
-        }
+        //if (type == MenuTypeEnum.Menu && permission != "")
+        //{
+        //    menu.Children.Add(NewMenu(MenuTypeEnum.Button, "新增", $"{permission}.create", 1));
+        //    menu.Children.Add(NewMenu(MenuTypeEnum.Button, "编辑", $"{permission}.update", 2));
+        //    menu.Children.Add(NewMenu(MenuTypeEnum.Button, "删除", $"{permission}.delete", 3));
+        //}
         return Audit(menu);
     }
     private static DeptEntity NewDept(string deptName, int sortNo, IEnumerable<DeptEntity>? children = null)
