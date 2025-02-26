@@ -60,7 +60,7 @@ namespace FeiNuo.Admin.Services.System
         /// 菜单ID
         /// </summary>
 		[Description("菜单ID")]
-        public IEnumerable<int> MenuIds { get; set; } = Enumerable.Empty<int>();
+        public IEnumerable<int> MenuIds { get; set; } = [];
 
     }
     #endregion

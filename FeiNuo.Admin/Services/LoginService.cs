@@ -35,7 +35,7 @@ namespace FeiNuo.Admin.Services
                 .Select(a => new { a.RoleCode, Permission = a.Menus.Select(a => a.Permission) })
                 .ToListAsync();
             var roles = userRoles.Select(a => a.RoleCode);
-            var permissions = userRoles.SelectMany(a => a.Permission).Where(a => !string.IsNullOrWhiteSpace(a)).Distinct();
+            var permissions = Array.Empty<string>();// userRoles.SelectMany(a => a.Permission).Where(a => !string.IsNullOrWhiteSpace(a)).Distinct();
 
             var data = user.UserId + "," + user.DeptId + "," + user.DeptName;
             return new LoginUser(user.Username, user.Nickname, user.Password, roles, permissions, data);
@@ -72,10 +72,10 @@ namespace FeiNuo.Admin.Services
         }
         private static List<MenuVO> ConvertToMenuVO(IEnumerable<MenuEntity> menus)
         {
-            return menus.Select(a => new MenuVO(a.MenuName, a.MenuPath, a.Icon)
+            return [.. menus.Select(a => new MenuVO(a.MenuName, a.MenuPath, a.Icon)
             {
                 Children = ConvertToMenuVO(a.Children)
-            }).ToList();
+            })];
         }
 
         //private static List<RouteVO> ConvertMenuToRoute(IEnumerable<MenuEntity> menus)

@@ -74,19 +74,11 @@ namespace FeiNuo.Admin.Services.System
     public class ConfigQuery : AbstractQuery<ConfigEntity>
     {
         /// <summary>
-        /// 是否作废
-        /// </summary>
-        public bool? Disabled { get; set; }
-
-        /// <summary>
         /// 根据查询条件添加查询表达式
         /// </summary>
         protected override void MergeQueryExpression()
         {
-            // AddExpression(Disabled.HasValue, r => r.Disabled == Disabled!.Value);
-            // AddExpression(RoleCode, r => r.RoleCode == RoleCode);
-            // AddSearchExpression(s => o => o.RoleCode.Contains(s) || o.RoleName.Contains(s));
-            AddDateExpression(s => o => o.CreateTime >= s, e => o => o.CreateTime <= e);
+            AddSearchExpression(s => o => o.ConfigCode.Contains(s) || o.ConfigName.Contains(s) || (o.Remark != null && o.Remark.Contains(s)));
         }
     }
     #endregion

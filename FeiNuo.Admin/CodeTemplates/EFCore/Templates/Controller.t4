@@ -54,7 +54,7 @@ namespace <#=cfg.RootNameSpace#>.Controllers<#= cfg.ModuleName == "" ? "" : ("."
             foreach (var property in entityType.GetProperties().Where(t=>t.Name!="UpdateBy"&&t.Name!="UpdateTime" && !t.IsPrimaryKey()).OrderBy(p => p.GetColumnOrder() ?? -1)) 
             {
 #>
-                new ExcelColumn<<#=entityName#>Dto>("<#=string.IsNullOrEmpty(property.GetComment())?"":code.XmlComment(property.GetComment())#>", d => d.<#=property.Name#>, 15),
+                new ExcelColumn<<#=entityName#>Dto>("<#=string.IsNullOrEmpty(property.GetComment())?"":code.XmlComment(property.GetComment())#>", d => d.<#=property.Name#>),
 <#          
             }
 #>

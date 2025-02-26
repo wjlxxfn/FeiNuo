@@ -50,13 +50,13 @@ namespace FeiNuo.Admin.Controllers.System
         {
             var pager = await service.FindPagedList(query, Pager.Unpaged, CurrentUser);
             var excel = new ExcelConfig($"参数配置导出{DateTime.Now:yyyyMMddHHmmss}.xlsx", pager.DataList, [
-                new ExcelColumn<ConfigDto>("参数编码", d => d.ConfigCode, 15),
-                new ExcelColumn<ConfigDto>("参数名称", d => d.ConfigName, 15),
-                new ExcelColumn<ConfigDto>("配置内容", d => d.ConfigValue, 15),
-                new ExcelColumn<ConfigDto>("其他配置", d => d.ExtraValue, 15),
-                new ExcelColumn<ConfigDto>("备注说明", d => d.Remark, 15),
-                new ExcelColumn<ConfigDto>("创建人", d => d.CreateBy, 15),
-                new ExcelColumn<ConfigDto>("创建时间", d => d.CreateTime, 15),
+                new ExcelColumn<ConfigDto>("参数编码", d => d.ConfigCode),
+                new ExcelColumn<ConfigDto>("参数名称", d => d.ConfigName),
+                new ExcelColumn<ConfigDto>("配置内容", d => d.ConfigValue, 15, s => s.WrapText = true),
+                new ExcelColumn<ConfigDto>("其他配置", d => d.ExtraValue, 15, s => s.WrapText = true),
+                new ExcelColumn<ConfigDto>("备注说明", d => d.Remark, 15, s => s.WrapText = true),
+                new ExcelColumn<ConfigDto>("创建人", d => d.CreateBy),
+                new ExcelColumn<ConfigDto>("创建时间", d => d.CreateTime),
             ]);
             var bytes = PoiHelper.GetExcelBytes(excel);
             return File(bytes, excel.ContentType, excel.FileName);

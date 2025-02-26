@@ -50,12 +50,12 @@ namespace FeiNuo.Admin.Controllers.System
         {
             var pager = await service.FindPagedList(query, Pager.Unpaged, CurrentUser);
             var excel = new ExcelConfig($"角色导出{DateTime.Now:yyyyMMddHHmmss}.xlsx", pager.DataList, [
-                new ExcelColumn<RoleDto>("角色编码", d => d.RoleCode, 15),
-                new ExcelColumn<RoleDto>("角色名称", d => d.RoleName, 15),
-                new ExcelColumn<RoleDto>("角色状态", d => d.Disabled?"作废":"正常", 10),
-                new ExcelColumn<RoleDto>("备注说明", d => d.Remark, 25),
-                new ExcelColumn<RoleDto>("创建人", d => d.CreateBy, 15),
-                new ExcelColumn<RoleDto>("创建时间", d => d.CreateTime, 12),
+                new ExcelColumn<RoleDto>("角色编码", d => d.RoleCode),
+                new ExcelColumn<RoleDto>("角色名称", d => d.RoleName),
+                new ExcelColumn<RoleDto>("角色状态", d => d.Disabled ? "作废":"正常"),
+                new ExcelColumn<RoleDto>("备注说明", d => d.Remark, 15, s => s.WrapText = true),
+                new ExcelColumn<RoleDto>("创建人", d => d.CreateBy),
+                new ExcelColumn<RoleDto>("创建时间", d => d.CreateTime),
             ]);
             var bytes = PoiHelper.GetExcelBytes(excel);
             return File(bytes, excel.ContentType, excel.FileName);
