@@ -18,12 +18,22 @@ namespace FeiNuo.Admin.Services.System
         #endregion
 
         #region 数据查询 
+        public async Task<IEnumerable<TreeOption>> GetDeptTree(int? deptId)
+        {
+            IEnumerable<DeptEntity> depts = await ctx.Depts.ToListAsync();
+            if (deptId.HasValue) depts = depts.Where(a => a.DeptId == deptId);
+            return depts.Where(a => a.Parent == null)
+                .OrderBy(a => a.SortNo)
+                .Select(a => a.Adapt<TreeOption>())
+                .ToList();
+        }
+
         /// <summary>
         /// 分页查询
         /// </summary>
         public async Task<PageResult<DeptDto>> FindPagedList(DeptQuery query, Pager pager, LoginUser user)
         {
-            var lstData = await FindPagedList(query, pager, o => o.OrderByDescending(t => t.CreateTime));
+            var lstData = await FindPagedList(query, pager, o => o.OrderByDescending(t => t.ParentId).ThenBy(t => t.SortNo));
             return lstData.Map(o => o.Adapt<DeptDto>());
         }
 
@@ -73,9 +83,9 @@ namespace FeiNuo.Admin.Services.System
         private async Task CopyDtoToEntity(DeptDto dto, DeptEntity entity, LoginUser user, bool isNew)
         {
             //TODO 检查数据重复
-            if (await ctx.Depts.AnyAsync(a => a.DeptId != dto.DeptId /* && (a.Name == dto.Name )*/))
+            if (await ctx.Depts.AnyAsync(a => a.DeptId != dto.DeptId && a.ParentId == dto.ParentId && (a.DeptName == dto.DeptName)))
             {
-                throw new MessageException("当前已存在相同名称或编码的部门");
+                throw new MessageException("同一层级下已存在相同名称的部门");
             }
 
             // 复制属性
@@ -103,6 +113,8 @@ namespace FeiNuo.Admin.Services.System
             // 提交事务
             await ctx.SaveChangesAsync();
         }
+
+
         #endregion
     }
 }

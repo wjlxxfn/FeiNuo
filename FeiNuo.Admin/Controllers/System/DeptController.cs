@@ -23,6 +23,16 @@ namespace FeiNuo.Admin.Controllers.System
         /// <summary>
         /// 分页查询
         /// </summary>
+        [HttpGet("tree")]
+        [EndpointSummary("查询部门树")]
+        public async Task<IEnumerable<TreeOption>> GetDeptTree([FromQuery] int? deptId)
+        {
+            return await service.GetDeptTree(deptId);
+        }
+
+        /// <summary>
+        /// 分页查询
+        /// </summary>
         [HttpGet]
         [EndpointSummary("分页查询")]
         public async Task<PageResult<DeptDto>> GetDeptList([FromQuery] DeptQuery query, [FromQuery] Pager pager)
@@ -50,13 +60,13 @@ namespace FeiNuo.Admin.Controllers.System
         {
             var pager = await service.FindPagedList(query, Pager.Unpaged, CurrentUser);
             var excel = new ExcelConfig($"部门导出{DateTime.Now:yyyyMMddHHmmss}.xlsx", pager.DataList, [
-                new ExcelColumn<DeptDto>("上级ID", d => d.ParentId, 15),
-                new ExcelColumn<DeptDto>("部门名称", d => d.DeptName, 15),
-                new ExcelColumn<DeptDto>("排序号", d => d.SortNo, 15),
-                new ExcelColumn<DeptDto>("是否作废", d => d.Disabled, 15),
-                new ExcelColumn<DeptDto>("备注说明", d => d.Remark, 15),
-                new ExcelColumn<DeptDto>("创建人", d => d.CreateBy, 15),
-                new ExcelColumn<DeptDto>("创建时间", d => d.CreateTime, 15),
+                new ExcelColumn<DeptDto>("上级ID", d => d.ParentId),
+                new ExcelColumn<DeptDto>("部门名称", d => d.DeptName),
+                new ExcelColumn<DeptDto>("排序号", d => d.SortNo),
+                new ExcelColumn<DeptDto>("是否作废", d => d.Disabled),
+                new ExcelColumn<DeptDto>("备注说明", d => d.Remark),
+                new ExcelColumn<DeptDto>("创建人", d => d.CreateBy),
+                new ExcelColumn<DeptDto>("创建时间", d => d.CreateTime),
             ]);
             var bytes = PoiHelper.GetExcelBytes(excel);
             return File(bytes, excel.ContentType, excel.FileName);

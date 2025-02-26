@@ -1,17 +1,22 @@
 using FeiNuo.Admin.Models;
+using Mapster;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
 namespace FeiNuo.Admin.Services.System
 {
     #region DTO属性映射    
-    //public class DeptDtoRegister : IRegister
-    //{
-    //    public void Register(TypeAdapterConfig config)
-    //    {
-    //        config.ForType<DeptEntity, DeptDto>().Map(d => d.DeptName, s => s.Dept.DeptName, s => s.Dept != null);
-    //    }
-    //}
+    public class DeptDtoRegister : IRegister
+    {
+        public void Register(TypeAdapterConfig config)
+        {
+            config.ForType<DeptEntity, DeptDto>().Map(d => d.ParentName, s => s.Parent == null ? null : s.Parent.DeptName, s => s.Parent != null);
+            config.ForType<DeptEntity, DeptDto>().Map(d => d.Children, s => s.Children.OrderBy(t => t.SortNo).Select(a => a.Adapt<DeptDto>()).ToList(), s => s.Children.Count > 0);
+
+            config.ForType<DeptEntity, TreeOption>().ConstructUsing(s => new TreeOption(s.DeptId, s.DeptName, s.Disabled));
+            config.ForType<DeptEntity, TreeOption>().Map(d => d.Children, s => s.Children.OrderBy(t => t.SortNo).Select(a => a.Adapt<TreeOption>()).ToList(), s => s.Children.Count > 0);
+        }
+    }
     #endregion
 
     #region 数据传输对象 DeptDto
@@ -31,6 +36,12 @@ namespace FeiNuo.Admin.Services.System
         /// </summary>
         [Description("上级ID")]
         public int? ParentId { get; set; }
+
+        /// <summary>
+        /// 上级名称
+        /// </summary>
+        [Description("上级名称")]
+        public string? ParentName { get; set; }
 
         /// <summary>
         /// 部门名称
@@ -59,6 +70,11 @@ namespace FeiNuo.Admin.Services.System
         [StringLength(200, ErrorMessage = "【备注说明】长度不能超过 200。")]
         public string? Remark { get; set; }
 
+        /// <summary>
+        /// 下级部门
+        /// </summary>
+        [Description("下级部门")]
+        public List<DeptDto> Children { get; set; } = [];
     }
     #endregion
 
@@ -68,6 +84,7 @@ namespace FeiNuo.Admin.Services.System
     /// </summary>
     public class DeptQuery : AbstractQuery<DeptEntity>
     {
+        public int? ParentId { get; set; }
         /// <summary>
         /// 是否作废
         /// </summary>
@@ -78,9 +95,9 @@ namespace FeiNuo.Admin.Services.System
         /// </summary>
         protected override void MergeQueryExpression()
         {
-            // AddExpression(Disabled.HasValue, r => r.Disabled == Disabled!.Value);
-            // AddExpression(RoleCode, r => r.RoleCode == RoleCode);
-            // AddSearchExpression(s => o => o.RoleCode.Contains(s) || o.RoleName.Contains(s));
+            AddExpression(ParentId.HasValue, r => r.ParentId == ParentId!.Value);
+            AddExpression(Disabled.HasValue, r => r.Disabled == Disabled!.Value);
+            AddSearchExpression(s => o => o.DeptName.Contains(s));
             AddDateExpression(s => o => o.CreateTime >= s, e => o => o.CreateTime <= e);
         }
     }
