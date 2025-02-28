@@ -18,14 +18,15 @@ namespace FeiNuo.Admin.Services.System
         #endregion
 
         #region 数据查询 
-        public async Task<IEnumerable<TreeOption>> GetDeptTree(int? deptId)
+        public async Task<IEnumerable<TreeOption>> GetDeptTree(int? rootId)
         {
-            IEnumerable<DeptEntity> depts = await ctx.Depts.ToListAsync();
-            if (deptId.HasValue) depts = depts.Where(a => a.DeptId == deptId);
-            return depts.Where(a => a.Parent == null)
-                .OrderBy(a => a.SortNo)
-                .Select(a => a.Adapt<TreeOption>())
-                .ToList();
+            var lstData = rootId.HasValue
+                ? await SelectDeptChildren(rootId.Value)
+                : await ctx.Depts.ToListAsync();
+
+            return lstData.Where(a => a.Parent == null)
+                .OrderBy(a => a.Disabled).ThenBy(a => a.SortNo)
+                .Select(a => a.Adapt<TreeOption>());
         }
 
         /// <summary>
@@ -33,8 +34,13 @@ namespace FeiNuo.Admin.Services.System
         /// </summary>
         public async Task<PageResult<DeptDto>> FindPagedList(DeptQuery query, Pager pager, LoginUser user)
         {
-            var lstData = await FindPagedList(query, pager, o => o.OrderByDescending(t => t.ParentId).ThenBy(t => t.SortNo));
-            return lstData.Map(o => o.Adapt<DeptDto>());
+            var lstAll = (query.Recursive && query.ParentId.HasValue)
+                ? await SelectDeptChildren(query.ParentId.Value, false, true)
+                : await ctx.Depts.AsNoTracking().ToListAsync();
+
+            var lstData = lstAll.Where(query.GetQueryExpression().Compile()).OrderBy(a => a.ParentId).ThenBy(a => a.SortNo);
+            var pageData = PageHelper.Page(lstData, pager);
+            return pageData.Map(o => o.Adapt<DeptDto>());
         }
 
         /// <summary>
@@ -116,5 +122,66 @@ namespace FeiNuo.Admin.Services.System
 
 
         #endregion
+
+        /// <summary>
+        /// 修改部门状态
+        /// </summary>
+        public async Task UpdateDeptStatus(int deptId, bool disabled)
+        {
+            if (disabled)
+            {
+                var depts = await SelectDeptChildren(deptId);
+                foreach (var dept in depts)
+                {
+                    dept.Disabled = true;
+                }
+            }
+            else
+            {
+                var depts = await SelectDeptParents(deptId);
+                foreach (var dept in depts)
+                {
+                    dept.Disabled = false;
+                }
+            }
+            await ctx.SaveChangesAsync();
+        }
+
+        /// <summary>
+        /// 根据部门ID查当前部门及所有下级子部门
+        /// </summary>
+        private async Task<List<DeptEntity>> SelectDeptChildren(int deptId, bool includeSelf = true, bool noTracking = false)
+        {
+            var sql = $@"WITH {(ctx.Database.IsMySql() ? "RECURSIVE " : "")} T AS ( 
+                    SELECT *  FROM sys_dept WHERE dept_id = {deptId}
+                    UNION ALL
+                    SELECT A.* FROM sys_dept AS A INNER JOIN T
+                     ON A.parent_id = T.dept_id
+                ) SELECT * FROM T
+            ";
+            var query = ctx.Depts.FromSqlRaw(sql);
+            if (noTracking) query = query.AsNoTracking();
+            var lstData = await query.ToListAsync();
+
+            return [.. lstData.Where(a => includeSelf || a.DeptId != deptId)];
+        }
+
+
+        /// <summary>
+        /// 查询指定科室的所有上级科室
+        /// </summary>
+        private async Task<List<DeptEntity>> SelectDeptParents(int deptId)
+        {
+            var sql = $@"WITH {(ctx.Database.IsMySql() ? "RECURSIVE " : "")} T AS ( 
+                    SELECT *  FROM sys_dept WHERE dept_id = {deptId}
+                    UNION ALL
+                    SELECT A.* FROM sys_dept AS A INNER JOIN T
+                     ON A.dept_id = T.parent_id
+                ) SELECT * FROM T
+            ";
+            return await ctx.Depts.FromSqlRaw(sql).ToListAsync();
+        }
+
+
     }
 }

@@ -88,7 +88,7 @@ namespace FeiNuo.Admin.Controllers.System
                 return ErrorMessage("要更新的数据和ID不匹配");
             }
             await service.UpdateRole(dto, CurrentUser);
-            return NoContent();
+            return Ok();
         }
 
         /// <summary>
@@ -116,7 +116,7 @@ namespace FeiNuo.Admin.Controllers.System
         {
             var disabled = status == 1;
             await service.UpdateRoleStatus(roleId, disabled, CurrentUser);
-            return NoContent();
+            return Ok();
         }
 
         /// <summary>
@@ -127,7 +127,7 @@ namespace FeiNuo.Admin.Controllers.System
         public async Task<ActionResult> UpdateRoleMenus(int roleId, [FromBody] int[] menuIds)
         {
             await service.UpdateRoleMenus(roleId, menuIds, CurrentUser);
-            return NoContent();
+            return Ok();
         }
         #endregion
     }

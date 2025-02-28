@@ -25,9 +25,9 @@ namespace FeiNuo.Admin.Controllers.System
         /// </summary>
         [HttpGet("tree")]
         [EndpointSummary("查询部门树")]
-        public async Task<IEnumerable<TreeOption>> GetDeptTree([FromQuery] int? deptId)
+        public async Task<IEnumerable<TreeOption>> GetDeptTree([FromQuery] int? rootId)
         {
-            return await service.GetDeptTree(deptId);
+            return await service.GetDeptTree(rootId);
         }
 
         /// <summary>
@@ -99,7 +99,7 @@ namespace FeiNuo.Admin.Controllers.System
                 return ErrorMessage("要更新的数据和ID不匹配");
             }
             await service.UpdateDept(dto, CurrentUser);
-            return NoContent();
+            return Ok();
         }
 
         /// <summary>
@@ -107,6 +107,7 @@ namespace FeiNuo.Admin.Controllers.System
         /// </summary>
         [HttpDelete]
         [EndpointSummary("删除部门")]
+        [Authorize(Roles = "SuperAdmin")]
         [Log("删除部门", OperateType.Delete)]
         public async Task<ActionResult> DeleteDeptByIds([FromQuery] int[] ids)
         {
@@ -116,6 +117,20 @@ namespace FeiNuo.Admin.Controllers.System
             }
             await service.DeleteDeptByIds(ids, CurrentUser);
             return NoContent();
+        }
+        #endregion
+
+
+        #region 其他操作
+        /// <summary>
+        /// 修改部门状态
+        /// </summary>
+        [HttpPatch("status/{deptId}")]
+        [Log("修改部门状态", OperateType.Update)]
+        public async Task<ActionResult> UpdateDeptStatus(int deptId, [FromQuery] bool disabled)
+        {
+            await service.UpdateDeptStatus(deptId, disabled);
+            return Ok();
         }
         #endregion
     }

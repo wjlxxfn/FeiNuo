@@ -89,7 +89,7 @@ namespace FeiNuo.Admin.Controllers.System
                 return ErrorMessage("要更新的数据和ID不匹配");
             }
             await service.UpdateConfig(dto, CurrentUser);
-            return NoContent();
+            return Ok();
         }
 
         /// <summary>
