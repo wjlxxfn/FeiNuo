@@ -13,20 +13,20 @@
         RootNameSpace = Options.ModelNamespace.Replace(".Models",""),
         // 过滤表,三个条件都满足的才生成
         TablePrefixes = new string[]{ "sys_" },
-        IncludeTables = new string[]{ },
+        IncludeTables = new string[]{ "sys_dept" },
         ExcludeTables = new string[]{"sys_role_menu","sys_user_role"  },
         ModuleName = "System", // 模块名，路径里使用{moduleName}
 
-        GenCode = false, //是否生成代码，false的话默认只生成model，这个文件里的项目就不生成
+        GenCode = true, //是否生成代码，false的话默认只生成model，这个文件里的项目就不生成
         Override = true, //覆盖生成
 
-        Dto        = new { Gen = false, FullName = "Services/{moduleName}/Dtos/{entityName}Dto.cs" },
-        Service    = new { Gen = false, FullName = "Services/{moduleName}/{entityName}Service.cs" },
-        Controller = new { Gen = false, FullName = "Controllers/{moduleName}/{entityName}Controller.cs" },
+        Dto        = new { Gen = true, FullName = "Services/{moduleName}/Dtos/{entityName}Dto.cs" },
+        Service    = new { Gen = true, FullName = "Services/{moduleName}/{entityName}Service.cs" },
+        Controller = new { Gen = true, FullName = "Controllers/{moduleName}/{entityName}Controller.cs" },
 
-        WebApi     = new { Gen = false, FullName = "src/api/{moduleName}/{entityName}.ts" },
-        WebPage    = new { Gen = false, FullName = "src/pages/{moduleName}/{entityName}/index.vue" },
-        WebForm    = new { Gen = false, FullName = "src/pages/{moduleName}/{entityName}/" },
+        WebApi     = new { Gen = true, FullName = "src/api/{moduleName}/{entityName}.ts" },
+        WebPage    = new { Gen = true, FullName = "src/pages/{moduleName}/{entityName}/index.vue" },
+        WebForm    = new { Gen = true, FullName = "src/pages/{moduleName}/{entityName}/" },
      };
      var systemFields = new string[]{"CreateBy","CreateTime","UpdateBy","UpdateTime"};
      /*******************************************************************************************************

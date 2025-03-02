@@ -7,7 +7,7 @@ namespace FeiNuo.Admin.Controllers.System
     /// <summary>
     /// API接口：部门
     /// </summary>
-    [Authorize]
+    [Authorize(Roles = "Admin")]
     [Route("api/system/[controller]")]
     public class DeptController : BaseController
     {
@@ -25,9 +25,9 @@ namespace FeiNuo.Admin.Controllers.System
         /// </summary>
         [HttpGet("tree")]
         [EndpointSummary("查询部门树")]
-        public async Task<IEnumerable<TreeOption>> GetDeptTree([FromQuery] int? rootId)
+        public async Task<IEnumerable<DeptDto>> GetDeptTree([FromQuery] DeptQuery query)
         {
-            return await service.GetDeptTree(rootId);
+            return await service.GetDeptTree(query);
         }
 
         /// <summary>
@@ -60,10 +60,9 @@ namespace FeiNuo.Admin.Controllers.System
         {
             var pager = await service.FindPagedList(query, Pager.Unpaged, CurrentUser);
             var excel = new ExcelConfig($"部门导出{DateTime.Now:yyyyMMddHHmmss}.xlsx", pager.DataList, [
-                new ExcelColumn<DeptDto>("上级ID", d => d.ParentId),
                 new ExcelColumn<DeptDto>("部门名称", d => d.DeptName),
                 new ExcelColumn<DeptDto>("排序号", d => d.SortNo),
-                new ExcelColumn<DeptDto>("是否作废", d => d.Disabled),
+                new ExcelColumn<DeptDto>("部门状态", d => d.Status.GetDescription()),
                 new ExcelColumn<DeptDto>("备注说明", d => d.Remark),
                 new ExcelColumn<DeptDto>("创建人", d => d.CreateBy),
                 new ExcelColumn<DeptDto>("创建时间", d => d.CreateTime),
@@ -120,16 +119,23 @@ namespace FeiNuo.Admin.Controllers.System
         }
         #endregion
 
-
-        #region 其他操作
+        #region 修改部门状态
         /// <summary>
         /// 修改部门状态
         /// </summary>
-        [HttpPatch("status/{deptId}")]
+        [HttpPatch("{deptId}/status")]
         [Log("修改部门状态", OperateType.Update)]
-        public async Task<ActionResult> UpdateDeptStatus(int deptId, [FromQuery] bool disabled)
+        public async Task<ActionResult> UpdateDeptStatus(int deptId, [FromBody] UpdateDto dto)
         {
-            await service.UpdateDeptStatus(deptId, disabled);
+            if (deptId != dto.Id)
+            {
+                return ErrorMessage("要更新的数据和ID不匹配");
+            }
+            if (!dto.Status.HasValue)
+            {
+                return ErrorMessage("没有传入要更新的状态信息：status");
+            }
+            await service.UpdateDeptStatus(deptId, dto.Status.Value);
             return Ok();
         }
         #endregion

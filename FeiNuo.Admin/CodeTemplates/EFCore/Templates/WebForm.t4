@@ -22,7 +22,7 @@
         if(propName=="remark") extraAtt += " type=\"textarea\" rows=\"2\"";
         if(!needsNullable) extraAtt += " :rules=\"[required]\"";
 #>
-          <q-form-item lable="<#=  string.IsNullOrEmpty(property.GetComment()) ? "" : code.XmlComment(property.GetComment()) #>">
+          <q-form-item lable="<#=  string.IsNullOrEmpty(property.GetComment()) ? "" : code.XmlComment(property.GetComment()) #>：">
             <q-input v-model="dto.<#=propName#>"<#=extraAtt#> /> 
           </q-form-item>
 <#

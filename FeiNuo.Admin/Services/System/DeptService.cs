@@ -18,15 +18,33 @@ namespace FeiNuo.Admin.Services.System
         #endregion
 
         #region 数据查询 
-        public async Task<IEnumerable<TreeOption>> GetDeptTree(int? rootId)
+        public async Task<IEnumerable<DeptDto>> GetDeptTree(DeptQuery query)
         {
-            var lstData = rootId.HasValue
-                ? await SelectDeptChildren(rootId.Value)
-                : await ctx.Depts.ToListAsync();
+            var parentId = query.ParentId;
+            query.ParentId = null;
+            var lstData = await ctx.Depts.Where(query.GetQueryExpression()).ToListAsync();
 
-            return lstData.Where(a => a.Parent == null)
-                .OrderBy(a => a.Disabled).ThenBy(a => a.SortNo)
-                .Select(a => a.Adapt<TreeOption>());
+            var lstTree = parentId.HasValue
+                ? lstData.Where(a => a.DeptId == parentId.Value)
+                : lstData.Where(a => a.Parent == null);
+
+            return lstTree.OrderBy(a => a.Status).ThenBy(a => a.SortNo).Select(a => a.Adapt<DeptDto>());
+        }
+
+
+        /// <summary>
+        /// 获取通用的部门树，返回TreeOption，通常用于下拉选项
+        /// </summary>
+        /// <param name="deptId"></param>
+        /// <param name="includeDisabled"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<TreeOption>> GetDeptTree(int? deptId, bool includeDisabled = false)
+        {
+            var depts = await ctx.Depts.Where(a => includeDisabled || a.Status == ((int)StatusEnum.Normal)).ToListAsync();
+            var lstTree = deptId.HasValue
+               ? depts.Where(a => a.DeptId == deptId.Value)
+               : depts.Where(a => a.Parent == null);
+            return lstTree.OrderBy(a => a.Status).ThenBy(a => a.SortNo).Select(a => a.Adapt<TreeOption>());
         }
 
         /// <summary>
@@ -34,13 +52,8 @@ namespace FeiNuo.Admin.Services.System
         /// </summary>
         public async Task<PageResult<DeptDto>> FindPagedList(DeptQuery query, Pager pager, LoginUser user)
         {
-            var lstAll = (query.Recursive && query.ParentId.HasValue)
-                ? await SelectDeptChildren(query.ParentId.Value, false, true)
-                : await ctx.Depts.AsNoTracking().ToListAsync();
-
-            var lstData = lstAll.Where(query.GetQueryExpression().Compile()).OrderBy(a => a.ParentId).ThenBy(a => a.SortNo);
-            var pageData = PageHelper.Page(lstData, pager);
-            return pageData.Map(o => o.Adapt<DeptDto>());
+            var lstData = await FindPagedList(query, pager, o => o.OrderBy(a => a.ParentId).ThenBy(a => a.SortNo));
+            return lstData.Map(o => o.Adapt<DeptDto>());
         }
 
         /// <summary>
@@ -77,8 +90,14 @@ namespace FeiNuo.Admin.Services.System
         {
             // 原始数据
             var entity = await FindByIdAsync(dto.DeptId);
+            var changeStatus = entity.Status != ((int)dto.Status);
             // 更新字段
             await CopyDtoToEntity(dto, entity, user, false);
+            // 更新状态
+            if (changeStatus)
+            {
+                await UpdateDeptStatus(dto.DeptId, dto.Status);
+            }
             // 执行更新
             await ctx.SaveChangesAsync();
         }
@@ -88,7 +107,7 @@ namespace FeiNuo.Admin.Services.System
         /// </summary>
         private async Task CopyDtoToEntity(DeptDto dto, DeptEntity entity, LoginUser user, bool isNew)
         {
-            //TODO 检查数据重复
+            // 检查数据重复
             if (await ctx.Depts.AnyAsync(a => a.DeptId != dto.DeptId && a.ParentId == dto.ParentId && (a.DeptName == dto.DeptName)))
             {
                 throw new MessageException("同一层级下已存在相同名称的部门");
@@ -106,14 +125,22 @@ namespace FeiNuo.Admin.Services.System
         /// </summary>
         public async Task DeleteDeptByIds(IEnumerable<int> ids, LoginUser user)
         {
-            var depts = await ctx.Depts.Where(a => ids.Contains(a.DeptId)).ToListAsync();
+            var depts = await ctx.Depts.Include(a => a.Children).Include(a => a.Users).Where(a => ids.Contains(a.DeptId)).ToListAsync();
             if (depts.Count != ids.Count())
             {
                 throw new MessageException("查询出的数据和传入的ID不匹配，请刷新后再试。");
             }
             foreach (var dept in depts)
             {
-                //TODO 判断是否能删除
+                // 判断是否能删除
+                if (dept.Users.Count > 0)
+                {
+                    throw new MessageException($"部门【{dept.DeptName}】下存在用户，不允许删除。");
+                }
+                if (dept.Children.Count > 0)
+                {
+                    throw new MessageException($"部门【{dept.DeptName}】下存在子部门，不允许删除。");
+                }
                 ctx.Depts.Remove(dept);
             }
             // 提交事务
@@ -123,26 +150,22 @@ namespace FeiNuo.Admin.Services.System
 
         #endregion
 
+        #region 修改部门状态
         /// <summary>
         /// 修改部门状态
         /// </summary>
-        public async Task UpdateDeptStatus(int deptId, bool disabled)
+        public async Task UpdateDeptStatus(int deptId, StatusEnum status)
         {
-            if (disabled)
+            if (deptId == 1) throw new MessageException("不允许调整根节点状态");
+
+            // 作废的要把所有下级一起作废，启用的要把所有上级一起启用
+            var depts = status == StatusEnum.Normal
+                ? await SelectDeptParents(deptId)
+                : await SelectDeptChildren(deptId);
+
+            foreach (var dept in depts)
             {
-                var depts = await SelectDeptChildren(deptId);
-                foreach (var dept in depts)
-                {
-                    dept.Disabled = true;
-                }
-            }
-            else
-            {
-                var depts = await SelectDeptParents(deptId);
-                foreach (var dept in depts)
-                {
-                    dept.Disabled = false;
-                }
+                dept.Status = ((byte)status);
             }
             await ctx.SaveChangesAsync();
         }
@@ -166,7 +189,6 @@ namespace FeiNuo.Admin.Services.System
             return [.. lstData.Where(a => includeSelf || a.DeptId != deptId)];
         }
 
-
         /// <summary>
         /// 查询指定科室的所有上级科室
         /// </summary>
@@ -181,7 +203,6 @@ namespace FeiNuo.Admin.Services.System
             ";
             return await ctx.Depts.FromSqlRaw(sql).ToListAsync();
         }
-
-
+        #endregion
     }
 }
