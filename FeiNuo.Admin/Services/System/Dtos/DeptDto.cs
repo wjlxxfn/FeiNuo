@@ -11,10 +11,10 @@ namespace FeiNuo.Admin.Services.System
         public void Register(TypeAdapterConfig config)
         {
             config.ForType<DeptEntity, DeptDto>().Map(d => d.ParentName, s => s.Parent == null ? null : s.Parent.DeptName, s => s.Parent != null);
-            config.ForType<DeptEntity, DeptDto>().Map(d => d.Children, s => s.Children.OrderBy(t => t.Disabled).ThenBy(a => a.SortNo).Select(a => a.Adapt<DeptDto>()).ToList(), s => s.Children.Count > 0);
+            config.ForType<DeptEntity, DeptDto>().Map(d => d.Children, s => s.Children.OrderBy(t => t.Status).ThenBy(a => a.SortNo).Select(a => a.Adapt<DeptDto>()).ToList(), s => s.Children.Count > 0);
 
-            config.ForType<DeptEntity, TreeOption>().ConstructUsing(s => new TreeOption(s.DeptId, s.DeptName, s.Disabled));
-            config.ForType<DeptEntity, TreeOption>().Map(d => d.Children, s => s.Children.OrderBy(t => t.Disabled).ThenBy(t => t.SortNo).Select(a => a.Adapt<TreeOption>()).ToList(), s => s.Children.Count > 0);
+            config.ForType<DeptEntity, TreeOption>().ConstructUsing(s => new TreeOption(s.DeptId, s.DeptName, s.Status == ((byte)StatusEnum.Disabled)));
+            config.ForType<DeptEntity, TreeOption>().Map(d => d.Children, s => s.Children.OrderBy(t => t.Status).ThenBy(t => t.SortNo).Select(a => a.Adapt<TreeOption>()).ToList(), s => s.Children.Count > 0);
         }
     }
     #endregion
@@ -58,10 +58,10 @@ namespace FeiNuo.Admin.Services.System
         public short SortNo { get; set; }
 
         /// <summary>
-        /// 是否作废
+        /// 部门状态
         /// </summary>
-        [Description("是否作废")]
-        public bool Disabled { get; set; }
+        [Description("部门状态")]
+        public StatusEnum Status { get; set; }
 
         /// <summary>
         /// 备注说明
@@ -75,6 +75,8 @@ namespace FeiNuo.Admin.Services.System
         /// </summary>
         [Description("下级部门")]
         public List<DeptDto> Children { get; set; } = [];
+
+        public bool Expandable { get; set; } = true;
     }
     #endregion
 
@@ -90,25 +92,17 @@ namespace FeiNuo.Admin.Services.System
         public int? ParentId { get; set; }
 
         /// <summary>
-        /// 递归查询，查询当前节点下的所有子节点，当有指定上级节点时才生效果
-        /// </summary>
-        public bool Recursive { get; set; } = false;
-
-        /// <summary>
         /// 是否作废
         /// </summary>
-        public bool? Disabled { get; set; }
+        public StatusEnum? Status { get; set; }
 
         /// <summary>
         /// 根据查询条件添加查询表达式
         /// </summary>
         protected override void MergeQueryExpression()
         {
-            if (!Recursive && ParentId.HasValue)
-            {
-                AddExpression(r => r.ParentId == ParentId.Value);
-            }
-            AddExpression(Disabled.HasValue, r => r.Disabled == Disabled!.Value);
+            AddExpression(ParentId.HasValue, r => r.ParentId == ParentId!.Value);
+            AddExpression(Status.HasValue, r => r.Status == ((byte)Status!.Value));
             AddSearchExpression(s => o => o.DeptName.Contains(s));
             AddDateExpression(s => o => o.CreateTime >= s, e => o => o.CreateTime <= e);
         }

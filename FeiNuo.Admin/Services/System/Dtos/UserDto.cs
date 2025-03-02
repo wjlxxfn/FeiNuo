@@ -90,13 +90,7 @@ namespace FeiNuo.Admin.Services.System
         /// 用户状态:正常，锁定，密码过期等
         /// </summary>
         [Description("用户状态:正常，锁定，密码过期等")]
-        public byte Status { get; set; }
-
-        /// <summary>
-        /// 是否作废
-        /// </summary>
-        [Description("是否作废")]
-        public bool Disabled { get; set; }
+        public StatusEnum Status { get; set; }
 
         /// <summary>
         /// 自我介绍
@@ -124,7 +118,7 @@ namespace FeiNuo.Admin.Services.System
         /// <summary>
         /// 是否作废
         /// </summary>
-        public bool? Disabled { get; set; }
+        public bool? Status { get; set; }
 
         /// <summary>
         /// 根据查询条件添加查询表达式

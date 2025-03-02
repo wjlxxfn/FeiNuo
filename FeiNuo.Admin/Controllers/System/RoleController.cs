@@ -52,7 +52,7 @@ namespace FeiNuo.Admin.Controllers.System
             var excel = new ExcelConfig($"角色导出{DateTime.Now:yyyyMMddHHmmss}.xlsx", pager.DataList, [
                 new ExcelColumn<RoleDto>("角色编码", d => d.RoleCode),
                 new ExcelColumn<RoleDto>("角色名称", d => d.RoleName),
-                new ExcelColumn<RoleDto>("角色状态", d => d.Disabled ? "作废":"正常"),
+                new ExcelColumn<RoleDto>("角色状态", d => d.Status.GetDescription()),
                 new ExcelColumn<RoleDto>("备注说明", d => d.Remark, 15, s => s.WrapText = true),
                 new ExcelColumn<RoleDto>("创建人", d => d.CreateBy),
                 new ExcelColumn<RoleDto>("创建时间", d => d.CreateTime),
@@ -110,12 +110,19 @@ namespace FeiNuo.Admin.Controllers.System
         /// <summary>
         /// 修改角色状态
         /// </summary>
-        [HttpPatch("{roleId}/status/{status}")]
+        [HttpPatch("{roleId}/status")]
         [Log("修改角色状态", OperateType.Update)]
-        public async Task<ActionResult> UpdateRoleStatus(int roleId, int status)
+        public async Task<ActionResult> UpdateRoleStatus(int roleId, [FromBody] UpdateDto dto)
         {
-            var disabled = status == 1;
-            await service.UpdateRoleStatus(roleId, disabled, CurrentUser);
+            if (roleId != dto.Id)
+            {
+                return ErrorMessage("要更新的数据和ID不匹配");
+            }
+            if (!dto.Status.HasValue)
+            {
+                return ErrorMessage("没有传入要更新的状态信息：status");
+            }
+            await service.UpdateRoleStatus(roleId, dto.Status.Value, CurrentUser);
             return Ok();
         }
 

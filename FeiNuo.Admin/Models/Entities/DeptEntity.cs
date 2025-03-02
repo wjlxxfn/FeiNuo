@@ -31,9 +31,9 @@ public partial class DeptEntity : BaseEntity
     public short SortNo { get; set; }
 
     /// <summary>
-    /// 是否作废
+    /// 部门状态：0正常/1作废
     /// </summary>
-    public bool Disabled { get; set; }
+    public byte Status { get; set; }
 
     /// <summary>
     /// 备注说明
@@ -64,7 +64,7 @@ public partial class DeptConfiguration : IEntityTypeConfiguration<DeptEntity>
         entity.Property(e => e.ParentId).HasColumnName("parent_id").HasComment("上级ID");
         entity.Property(e => e.DeptName).HasColumnName("dept_name").HasComment("部门名称").HasMaxLength(50);
         entity.Property(e => e.SortNo).HasColumnName("sort_no").HasComment("排序号");
-        entity.Property(e => e.Disabled).HasColumnName("disabled").HasComment("是否作废");
+        entity.Property(e => e.Status).HasColumnName("status").HasComment("部门状态：0正常/1作废");
         entity.Property(e => e.Remark).HasColumnName("remark").HasComment("备注说明").HasMaxLength(200);
         entity.Property(e => e.CreateBy).HasColumnName("create_by").HasComment("创建人").HasMaxLength(50).IsUnicode(false);
         entity.Property(e => e.CreateTime).HasColumnName("create_time").HasComment("创建时间");

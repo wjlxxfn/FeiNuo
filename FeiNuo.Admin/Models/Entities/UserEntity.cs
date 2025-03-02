@@ -56,14 +56,9 @@ public partial class UserEntity : BaseEntity
     public string? Avatar { get; set; }
 
     /// <summary>
-    /// 用户状态:正常，锁定，密码过期等
+    /// 用户状态：0正常/1作废
     /// </summary>
     public byte Status { get; set; }
-
-    /// <summary>
-    /// 是否作废
-    /// </summary>
-    public bool Disabled { get; set; }
 
     /// <summary>
     /// 自我介绍
@@ -104,8 +99,7 @@ public partial class UserConfiguration : IEntityTypeConfiguration<UserEntity>
         entity.Property(e => e.Cellphone).HasColumnName("cellphone").HasComment("手机号码").HasMaxLength(20).IsUnicode(false);
         entity.Property(e => e.Email).HasColumnName("email").HasComment("电子邮箱").HasMaxLength(100).IsUnicode(false);
         entity.Property(e => e.Avatar).HasColumnName("avatar").HasComment("头像").HasMaxLength(200).IsUnicode(false);
-        entity.Property(e => e.Status).HasColumnName("status").HasComment("用户状态:正常，锁定，密码过期等");
-        entity.Property(e => e.Disabled).HasColumnName("disabled").HasComment("是否作废");
+        entity.Property(e => e.Status).HasColumnName("status").HasComment("用户状态：0正常/1作废");
         entity.Property(e => e.Introduction).HasColumnName("introduction").HasComment("自我介绍").HasMaxLength(500);
         entity.Property(e => e.Remark).HasColumnName("remark").HasComment("备注").HasMaxLength(200);
         entity.Property(e => e.CreateBy).HasColumnName("create_by").HasComment("创建人").HasMaxLength(50).IsUnicode(false);

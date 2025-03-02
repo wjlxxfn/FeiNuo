@@ -59,7 +59,7 @@ namespace FeiNuo.Admin.Controllers.System
                 new ExcelColumn<UserDto>("电子邮箱", d => d.Email, 15),
                 new ExcelColumn<UserDto>("头像", d => d.Avatar, 15),
                 new ExcelColumn<UserDto>("用户状态:正常，锁定，密码过期等", d => d.Status, 15),
-                new ExcelColumn<UserDto>("是否作废", d => d.Disabled, 15),
+                new ExcelColumn<UserDto>("用户状态", d => d.Status, 15),
                 new ExcelColumn<UserDto>("自我介绍", d => d.Introduction, 15),
                 new ExcelColumn<UserDto>("备注", d => d.Remark, 15),
                 new ExcelColumn<UserDto>("创建人", d => d.CreateBy, 15),

@@ -109,12 +109,12 @@ namespace FeiNuo.Admin.Services.System
             {
                 if (role.RoleCode == AppConstants.SUPER_ADMIN)
                 {
-                    throw new MessageException("不能删除超级管理员角色");
+                    throw new WarningException("不能删除超级管理员角色");
                 }
                 // 关联用户的不能删
                 if (role.Users.Count != 0)
                 {
-                    throw new MessageException($"角色{role.RoleName}存在关联用户，不能删除", MessageType.Warning);
+                    throw new MessageException($"角色{role.RoleName}存在关联用户，不能删除");
                 }
                 // 删除菜单关联关系
                 role.Menus.Clear();
@@ -127,14 +127,20 @@ namespace FeiNuo.Admin.Services.System
         /// <summary>
         /// 修改角色状态
         /// </summary>
-        public async Task UpdateRoleStatus(int roleId, bool disabled, LoginUser currentUser)
+        public async Task UpdateRoleStatus(int roleId, StatusEnum status, LoginUser currentUser)
         {
-            var role = await FindByIdAsync(roleId);
+            var role = await ctx.Roles.Include(a => a.Users).SingleOrDefaultAsync(a => a.RoleId == roleId)
+                ?? throw new NotFoundException("找不到角色id=" + roleId);
+
             if (role.RoleCode == AppConstants.SUPER_ADMIN)
             {
-                throw new MessageException("不允许操作超级管理员角色");
+                throw new WarningException("不允许操作超级管理员角色");
             }
-            role.Disabled = disabled;
+            if (status == StatusEnum.Disabled && role.Users.Count != 0)
+            {
+                throw new MessageException("当前角色存在关联用户，不允许作废");
+            }
+            role.Status = ((byte)status);
             await ctx.SaveChangesAsync();
         }
 
