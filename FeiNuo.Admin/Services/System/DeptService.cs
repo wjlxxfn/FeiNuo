@@ -11,7 +11,7 @@ namespace FeiNuo.Admin.Services.System
     {
         #region 构造函数
         protected readonly FNDbContext ctx;
-        public DeptService(FNDbContext ctx) : base(ctx)
+        public DeptService(FNDbContext ctx)
         {
             this.ctx = ctx;
         }
@@ -52,7 +52,8 @@ namespace FeiNuo.Admin.Services.System
         /// </summary>
         public async Task<PageResult<DeptDto>> FindPagedList(DeptQuery query, Pager pager, LoginUser user)
         {
-            var lstData = await FindPagedList(query, pager, o => o.OrderBy(a => a.ParentId).ThenBy(a => a.SortNo));
+            var dbSet = ctx.Depts.AsNoTracking().Where(query.GetQueryExpression());
+            var lstData = await PageHelper.FindPagedList(dbSet, pager, o => o.OrderBy(a => a.ParentId).ThenBy(a => a.SortNo));
             return lstData.Map(o => o.Adapt<DeptDto>());
         }
 
@@ -63,6 +64,11 @@ namespace FeiNuo.Admin.Services.System
         {
             var entity = await FindByIdAsync(deptId);
             return entity.Adapt<DeptDto>();
+        }
+		
+        private async Task<DeptEntity> FindByIdAsync(int deptId)
+        {
+            return await ctx.Depts.FindAsync(deptId) ?? throw new NotFoundException($"找不到指定数据,Id:{deptId},Type:{typeof(DeptEntity)}");
         }
         #endregion
 

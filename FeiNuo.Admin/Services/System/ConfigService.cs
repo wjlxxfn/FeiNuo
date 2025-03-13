@@ -13,7 +13,7 @@ namespace FeiNuo.Admin.Services.System
         #region 构造函数
         protected readonly FNDbContext ctx;
         private readonly IMemoryCache cache;
-        public ConfigService(FNDbContext ctx, IMemoryCache cache) : base(ctx)
+        public ConfigService(FNDbContext ctx, IMemoryCache cache)
         {
             this.ctx = ctx;
             this.cache = cache;
@@ -26,7 +26,8 @@ namespace FeiNuo.Admin.Services.System
         /// </summary>
         public async Task<PageResult<ConfigDto>> FindPagedList(ConfigQuery query, Pager pager, LoginUser user)
         {
-            var lstData = await FindPagedList(query, pager, o => o.OrderByDescending(t => t.CreateTime));
+            var dbSet = ctx.Configs.AsNoTracking().Where(query.GetQueryExpression());
+            var lstData = await PageHelper.FindPagedList(dbSet, pager, o => o.OrderByDescending(t => t.CreateTime));
             return lstData.Map(o => o.Adapt<ConfigDto>());
         }
 
@@ -37,6 +38,11 @@ namespace FeiNuo.Admin.Services.System
         {
             var entity = await FindByIdAsync(configId);
             return entity.Adapt<ConfigDto>();
+        }
+
+        private async Task<ConfigEntity> FindByIdAsync(int configId)
+        {
+            return await ctx.Configs.FindAsync(configId) ?? throw new NotFoundException($"找不到指定数据,Id:{configId},Type:{typeof(ConfigEntity)}");
         }
         #endregion
 

@@ -57,17 +57,17 @@ public class DbInitializer
             ]),
 
             NewMenu(MenuTypeEnum.Module, "嵌套菜单","nested",5,"",[
-                NewMenu(MenuTypeEnum.Module, "第一层模块","nested.first",1,"",[
-                    NewMenu(MenuTypeEnum.Module, "第二层模块","nested.second",4,"",[
-                        NewMenu(MenuTypeEnum.Menu, "第三层菜单","nested.third",4),
-                        NewMenu(MenuTypeEnum.Menu, "第三层菜单","nested.third",4),
+                NewMenu(MenuTypeEnum.Module, "第一层模块","nested.first-module",1,"",[
+                    NewMenu(MenuTypeEnum.Module, "第二层模块","nested.second-module",4,"",[
+                        NewMenu(MenuTypeEnum.Menu, "第三层菜单","nested.thirdmenu",4),
+                        NewMenu(MenuTypeEnum.Menu, "第三层菜单","nested.thirdmenu2",4),
                     ]),
-                    NewMenu(MenuTypeEnum.Menu, "第二层菜单","nested.second",4),
+                    NewMenu(MenuTypeEnum.Menu, "第二层菜单","nested.second-menu",4),
                 ]),
-                NewMenu(MenuTypeEnum.Menu, "第一层菜单","nested.first",2),
+                NewMenu(MenuTypeEnum.Menu, "第一层菜单","nested.first-menu",2),
             ]),
 
-            NewMenu(MenuTypeEnum.Menu, "官网链接","http://www.xxfn.top",4, "home"),
+            NewMenu(MenuTypeEnum.Menu, "官网链接","http://www.xxfn.top",4, ""),
         ];
         ctx.Menus.AddRange(menus);
         ctx.SaveChanges();
@@ -150,7 +150,8 @@ public class DbInitializer
         var role = new RoleEntity()
         {
             RoleCode = roleCode,
-            RoleName = roleName
+            RoleName = roleName,
+            Remark = remark
         };
         role.Menus = menus ?? [];
         return Audit(role);

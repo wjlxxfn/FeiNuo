@@ -11,7 +11,7 @@ namespace FeiNuo.Admin.Services.System
     {
         #region 构造函数
         protected readonly FNDbContext ctx;
-        public RoleService(FNDbContext ctx) : base(ctx)
+        public RoleService(FNDbContext ctx)
         {
             this.ctx = ctx;
         }
@@ -27,7 +27,8 @@ namespace FeiNuo.Admin.Services.System
             {
                 query.AddExpression(a => a.RoleCode != AppConstants.SUPER_ADMIN);
             }
-            var lstData = await FindPagedList(query, pager, o => o.OrderByDescending(t => t.CreateTime));
+            var dbSet = ctx.Roles.AsNoTracking().Where(query.GetQueryExpression());
+            var lstData = await PageHelper.FindPagedList(dbSet, pager, o => o.OrderByDescending(t => t.CreateTime));
             return lstData.Map(o => o.Adapt<RoleDto>());
         }
 
@@ -39,6 +40,11 @@ namespace FeiNuo.Admin.Services.System
             var entity = await ctx.Roles.Include(a => a.Menus).SingleOrDefaultAsync(a => a.RoleId == roleId)
                 ?? throw new NotFoundException("找不到角色:" + roleId);
             return entity.Adapt<RoleDto>();
+        }
+
+        private async Task<RoleEntity> FindByIdAsync(int roleId)
+        {
+            return await ctx.Roles.FindAsync(roleId) ?? throw new NotFoundException($"找不到指定数据,Id:{roleId},Type:{typeof(RoleEntity)}");
         }
         #endregion
 

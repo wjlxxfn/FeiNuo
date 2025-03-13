@@ -11,7 +11,7 @@ namespace FeiNuo.Admin.Services.System
     {
         #region 构造函数
         protected readonly FNDbContext ctx;
-        public MenuService(FNDbContext ctx) : base(ctx)
+        public MenuService(FNDbContext ctx)
         {
             this.ctx = ctx;
         }
@@ -24,7 +24,7 @@ namespace FeiNuo.Admin.Services.System
         public async Task<List<MenuDto>> GetMenuTree()
         {
             var menus = await ctx.Menus.OrderBy(a => a.SortNo).ToListAsync();
-            return menus.Where(a => a.Parent == null).Select(a => a.Adapt<MenuDto>()).ToList();
+            return [.. menus.Where(a => a.Parent == null).Select(a => a.Adapt<MenuDto>())];
         }
 
         /// <summary>
@@ -32,7 +32,8 @@ namespace FeiNuo.Admin.Services.System
         /// </summary>
         public async Task<PageResult<MenuDto>> FindPagedList(MenuQuery query, Pager pager, LoginUser user)
         {
-            var lstData = await FindPagedList(query, pager, o => o.OrderByDescending(t => t.CreateTime));
+            var dbSet = ctx.Menus.AsNoTracking().Where(query.GetQueryExpression());
+            var lstData = await PageHelper.FindPagedList(dbSet, pager, o => o.OrderByDescending(t => t.CreateTime));
             return lstData.Map(o => o.Adapt<MenuDto>());
         }
 
@@ -43,6 +44,10 @@ namespace FeiNuo.Admin.Services.System
         {
             var entity = await FindByIdAsync(menuId);
             return entity.Adapt<MenuDto>();
+        }
+        private async Task<MenuEntity> FindByIdAsync(int menuId)
+        {
+            return await ctx.Menus.FindAsync(menuId) ?? throw new NotFoundException($"找不到指定数据,Id:{menuId},Type:{typeof(MenuEntity)}");
         }
         #endregion
 

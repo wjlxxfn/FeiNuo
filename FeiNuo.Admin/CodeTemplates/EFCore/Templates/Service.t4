@@ -12,7 +12,7 @@ namespace <#=cfg.RootNameSpace#>.Services<#= cfg.ModuleName == "" ? "" : ("."+cf
     {
         #region 构造函数
         protected readonly <#= Options.ContextName #> ctx;
-        public <#=entityName#>Service(<#= Options.ContextName #> ctx) : base(ctx)
+        public <#=entityName#>Service(<#= Options.ContextName #> ctx)
         {
             this.ctx = ctx;
         }
@@ -24,7 +24,8 @@ namespace <#=cfg.RootNameSpace#>.Services<#= cfg.ModuleName == "" ? "" : ("."+cf
         /// </summary>
         public async Task<PageResult<<#=entityName#>Dto>> FindPagedList(<#=entityName#>Query query, Pager pager, LoginUser user)
         {
-            var lstData = await FindPagedList(query, pager, o => o.OrderByDescending(t => t.CreateTime));
+            var dbSet = ctx.<#= dbSetName #>.AsNoTracking().Where(query.GetQueryExpression());
+            var lstData = await PageHelper.FindPagedList(dbSet, pager, o => o.OrderByDescending(t => t.CreateTime));
             return lstData.Map(o => o.Adapt<<#=entityName#>Dto>());
         }
 
@@ -35,6 +36,11 @@ namespace <#=cfg.RootNameSpace#>.Services<#= cfg.ModuleName == "" ? "" : ("."+cf
         {
             var entity = await FindByIdAsync(<#=pkProperty#>);
             return entity.Adapt<<#=entityName#>Dto>();
+        }
+
+        private async Task<<#=entityType.Name#>Entity> FindByIdAsync(<#=pkPropertyType#> <#=pkProperty#>)
+        {
+            return await ctx.<#= dbSetName #>.FindAsync(<#=pkProperty#>) ?? throw new NotFoundException($"找不到指定数据,Id:{<#=pkProperty#>},Type:{typeof(<#=entityType.Name#>Entity)}");
         }
         #endregion
 

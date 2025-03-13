@@ -11,7 +11,7 @@ namespace FeiNuo.Admin.Services.System
     {
         #region 构造函数
         protected readonly FNDbContext ctx;
-        public LogService(FNDbContext ctx) : base(ctx)
+        public LogService(FNDbContext ctx)
         {
             this.ctx = ctx;
         }
@@ -23,7 +23,8 @@ namespace FeiNuo.Admin.Services.System
         /// </summary>
         public async Task<PageResult<LogDto>> FindPagedList(LogQuery query, Pager pager, LoginUser user)
         {
-            var lstData = await FindPagedList(query, pager, o => o.OrderByDescending(t => t.CreateTime));
+            var dbSet = ctx.Logs.AsNoTracking().Where(query.GetQueryExpression());
+            var lstData = await PageHelper.FindPagedList(dbSet, pager, o => o.OrderBy(a => a.CreateTime));
             return lstData.Map(o => o.Adapt<LogDto>());
         }
 
@@ -32,7 +33,7 @@ namespace FeiNuo.Admin.Services.System
         /// </summary>
         public async Task<LogDto> GetLog(long logId)
         {
-            var entity = await FindByIdAsync(logId);
+            var entity = await ctx.Logs.FindAsync(logId);
             return entity.Adapt<LogDto>();
         }
         #endregion
@@ -60,7 +61,7 @@ namespace FeiNuo.Admin.Services.System
         public async Task UpdateLog(LogDto dto, LoginUser user)
         {
             // 原始数据
-            var entity = await FindByIdAsync(dto.LogId);
+            var entity = await ctx.Logs.FindAsync(dto.LogId);
             // 更新字段
             await CopyDtoToEntity(dto, entity, user, false);
             // 执行更新

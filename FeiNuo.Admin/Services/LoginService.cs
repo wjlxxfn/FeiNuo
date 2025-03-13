@@ -1,4 +1,5 @@
 ﻿using FeiNuo.Admin.Models;
+using FeiNuo.Core.Login;
 using Microsoft.EntityFrameworkCore;
 
 namespace FeiNuo.Admin.Services

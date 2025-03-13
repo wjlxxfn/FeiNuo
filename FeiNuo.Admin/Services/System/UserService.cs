@@ -11,7 +11,7 @@ namespace FeiNuo.Admin.Services.System
     {
         #region 构造函数
         protected readonly FNDbContext ctx;
-        public UserService(FNDbContext ctx) : base(ctx)
+        public UserService(FNDbContext ctx)
         {
             this.ctx = ctx;
         }
@@ -23,7 +23,8 @@ namespace FeiNuo.Admin.Services.System
         /// </summary>
         public async Task<PageResult<UserDto>> FindPagedList(UserQuery query, Pager pager, LoginUser user)
         {
-            var lstData = await FindPagedList(query, pager, o => o.OrderByDescending(t => t.CreateTime));
+            var dbSet = ctx.Users.AsNoTracking().Where(query.GetQueryExpression());
+            var lstData = await PageHelper.FindPagedList(dbSet, pager, o => o.OrderByDescending(t => t.CreateTime));
             return lstData.Map(o => o.Adapt<UserDto>());
         }
 
@@ -34,6 +35,11 @@ namespace FeiNuo.Admin.Services.System
         {
             var entity = await FindByIdAsync(userId);
             return entity.Adapt<UserDto>();
+        }
+		
+        private async Task<UserEntity> FindByIdAsync(int userId)
+        {
+            return await ctx.Users.FindAsync(userId) ?? throw new NotFoundException($"找不到指定数据,Id:{userId},Type:{typeof(UserEntity)}");
         }
         #endregion
 
