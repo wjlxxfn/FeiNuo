@@ -4,10 +4,10 @@
 		<TargetFramework>net9.0</TargetFramework>
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
-		<GenerateDocumentationFile>True</GenerateDocumentationFile>
 	</PropertyGroup>
 
 	<ItemGroup>
+		<PackageReference Include="FeiNuo.AspNetCore" Version="1.1.0" />
 		<PackageReference Include="Mapster" Version="7.4.0" />
 		<PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.2" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.2" />
@@ -27,8 +27,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\..\FeiNuo.Core\FeiNuo.AspNetCore\FeiNuo.AspNetCore.csproj" />
-	  <ProjectReference Include="..\..\FeiNuo.Core\FeiNuo.Core\FeiNuo.Core.csproj" />
+		<Content Update="efpt.config.json" CopyToOutputDirectory="Never" />
+		<Content Update="efpt.renaming.json" CopyToOutputDirectory="Never" />
 	</ItemGroup>
 
 </Project>
