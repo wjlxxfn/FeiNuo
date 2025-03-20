@@ -1,11 +1,11 @@
 ﻿export interface <#=entityName#>Dto {
 <#
-    foreach (var property in entityType.GetProperties().OrderBy(p => p.GetColumnOrder() ?? -1))
+    foreach (var property in entityType.GetProperties().Where(a=>!systemFields.Contains(a.Name)).OrderBy(p => p.GetColumnOrder() ?? -1))
     {
         var needsNullable =( Options.UseNullableReferenceTypes && property.IsNullable && !property.ClrType.IsValueType)
-            ||(code.Reference(property.ClrType)).Contains("?");
+            ||(code.Reference(property.ClrType)).Contains("?")
+            || property.IsPrimaryKey();
         var propName = property.Name.Substring(0,1).ToLower()+property.Name.Substring(1);
-        if(propName=="UpdateTime"||propName=="UpdateBy") continue;
         var tsType = code.Reference(property.ClrType).Replace("?","");
         if(property.IsPrimaryKey()||property.IsForeignKey()) tsType="IdType";
         if(tsType.Contains("decimal")||tsType=="int"||tsType=="double"||tsType=="long"||tsType=="float"||tsType=="short"||tsType=="byte") tsType = "number";
@@ -14,7 +14,8 @@
         if(tsType=="char") tsType="string";
         if(tsType=="Guid") tsType="string";
 #>
-  <#=propName#><#= needsNullable ? "?" : "" #>: <#=tsType#>; // <#=  string.IsNullOrEmpty(property.GetComment()) ? "" : code.XmlComment(property.GetComment()) #>
+  /** <#=  string.IsNullOrEmpty(property.GetComment()) ? "" : code.XmlComment(property.GetComment()) #> */
+  <#=propName#><#= needsNullable ? "?" : "" #>: <#=tsType#>;
 <#
     }
 #>

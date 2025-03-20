@@ -23,6 +23,14 @@
          "ObjectType": 0
       },
       {
+         "Name": "[dbo].[sys_dict]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[sys_dict_item]",
+         "ObjectType": 0
+      },
+      {
          "Name": "[dbo].[sys_log]",
          "ObjectType": 0
       },
@@ -60,6 +68,7 @@
    "UseHandleBars": false,
    "UseHierarchyId": false,
    "UseInflector": true,
+   "UseInternalAccessModifiersForSprocsAndFunctions": false,
    "UseLegacyPluralizer": true,
    "UseManyToManyEntity": false,
    "UseNoDefaultConstructor": false,

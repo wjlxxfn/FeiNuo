@@ -21,6 +21,8 @@ public partial class FNDbContext
         // 日志不会有修改记录，去掉几个公用字段
         modelBuilder.Entity<LogEntity>().Ignore(a => a.UpdateBy).Ignore(a => a.UpdateTime);
 
+        modelBuilder.Entity<DictItemEntity>().Ignore(a => a.CreateBy).Ignore(a => a.CreateTime).Ignore(a => a.UpdateBy).Ignore(a => a.UpdateTime);
+
         // 批量覆盖配置
         //foreach (var entityType in modelBuilder.Model.GetEntityTypes())
         //{

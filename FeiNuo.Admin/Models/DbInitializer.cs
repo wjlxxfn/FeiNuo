@@ -106,6 +106,20 @@ public class DbInitializer
         ctx.SaveChanges();
         #endregion
 
+        #region 数据字典
+        ctx.Dicts.AddRange(Audit(new DictEntity()
+        {
+            DictType = "UserGender",
+            DictName = "性别",
+            DictItems = [
+                Audit(new DictItemEntity() { DictValue = "M", DictLabel = "男" }),
+                Audit(new DictItemEntity() { DictValue = "F", DictLabel = "女" }),
+                Audit(new DictItemEntity() { DictValue = "O", DictLabel = "保密" }),
+            ]
+        }));
+        ctx.SaveChanges();
+        #endregion
+
         trans.Commit();
     }
 

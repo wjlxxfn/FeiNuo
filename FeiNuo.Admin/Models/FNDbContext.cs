@@ -21,6 +21,16 @@ public partial class FNDbContext : DbContext
     public virtual DbSet<DeptEntity> Depts { get; set; }
 
     /// <summary>
+    /// 数据字典
+    /// </summary>
+    public virtual DbSet<DictEntity> Dicts { get; set; }
+
+    /// <summary>
+    /// 字典项
+    /// </summary>
+    public virtual DbSet<DictItemEntity> DictItems { get; set; }
+
+    /// <summary>
     /// 操作日志
     /// </summary>
     public virtual DbSet<LogEntity> Logs { get; set; }
@@ -46,6 +56,10 @@ public partial class FNDbContext : DbContext
         modelBuilder.ApplyConfiguration(new ConfigConfiguration());
         // 部门
         modelBuilder.ApplyConfiguration(new DeptConfiguration());
+        // 数据字典
+        modelBuilder.ApplyConfiguration(new DictConfiguration());
+        // 字典项
+        modelBuilder.ApplyConfiguration(new DictItemConfiguration());
         // 操作日志
         modelBuilder.ApplyConfiguration(new LogConfiguration());
         // 菜单
