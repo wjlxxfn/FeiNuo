@@ -8,7 +8,7 @@
         if(propName=="UpdateTime"||propName=="UpdateBy") continue;
         var tsType = code.Reference(property.ClrType).Replace("?","");
         if(property.IsPrimaryKey()||property.IsForeignKey()) tsType="IdType";
-        if(tsType.Contains("decimal")||tsType=="int"||tsType=="double"||tsType=="long"||tsType=="float"||tsType=="short") tsType = "number";
+        if(tsType.Contains("decimal")||tsType=="int"||tsType=="double"||tsType=="long"||tsType=="float"||tsType=="short"||tsType=="byte") tsType = "number";
         if(tsType=="bool") tsType="boolean";
         if(tsType.Contains("DateTime")) tsType="string";
         if(tsType=="char") tsType="string";

@@ -50,20 +50,17 @@ namespace FeiNuo.Admin.Controllers.System
         {
             var pager = await service.FindPagedList(query, Pager.Unpaged, CurrentUser);
             var excel = new ExcelConfig($"用户导出{DateTime.Now:yyyyMMddHHmmss}.xlsx", pager.DataList, [
-                new ExcelColumn<UserDto>("登录用户名", d => d.Username, 15),
-                new ExcelColumn<UserDto>("用户昵称", d => d.Nickname, 15),
-                new ExcelColumn<UserDto>("登录密码", d => d.Password, 15),
-                new ExcelColumn<UserDto>("部门ID", d => d.DeptId, 15),
-                new ExcelColumn<UserDto>("性别：M/F/O", d => d.Gender, 15),
-                new ExcelColumn<UserDto>("手机号码", d => d.Cellphone, 15),
-                new ExcelColumn<UserDto>("电子邮箱", d => d.Email, 15),
-                new ExcelColumn<UserDto>("头像", d => d.Avatar, 15),
-                new ExcelColumn<UserDto>("用户状态:正常，锁定，密码过期等", d => d.Status, 15),
-                new ExcelColumn<UserDto>("用户状态", d => d.Status, 15),
-                new ExcelColumn<UserDto>("自我介绍", d => d.Introduction, 15),
-                new ExcelColumn<UserDto>("备注", d => d.Remark, 15),
-                new ExcelColumn<UserDto>("创建人", d => d.CreateBy, 15),
-                new ExcelColumn<UserDto>("创建时间", d => d.CreateTime, 15),
+                new ExcelColumn<UserDto>("用户名", d => d.Username),
+                new ExcelColumn<UserDto>("用户昵称", d => d.Nickname),
+                new ExcelColumn<UserDto>("部门名称", d => d.DeptName),
+                new ExcelColumn<UserDto>("性别", d => d.Gender),
+                new ExcelColumn<UserDto>("手机号码", d => d.Cellphone),
+                new ExcelColumn<UserDto>("电子邮箱", d => d.Email),
+                new ExcelColumn<UserDto>("用户状态", d => d.Status.GetDescription()),
+                new ExcelColumn<UserDto>("自我介绍", d => d.Introduction),
+                new ExcelColumn<UserDto>("备注", d => d.Remark),
+                new ExcelColumn<UserDto>("创建人", d => d.CreateBy),
+                new ExcelColumn<UserDto>("创建时间", d => d.CreateTime),
             ]);
             var bytes = PoiHelper.GetExcelBytes(excel);
             return File(bytes, excel.ContentType, excel.FileName);

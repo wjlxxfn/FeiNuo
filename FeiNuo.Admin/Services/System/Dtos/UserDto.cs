@@ -1,17 +1,18 @@
 using FeiNuo.Admin.Models;
+using Mapster;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
 namespace FeiNuo.Admin.Services.System
 {
     #region DTO属性映射    
-    //public class UserDtoRegister : IRegister
-    //{
-    //    public void Register(TypeAdapterConfig config)
-    //    {
-    //        config.ForType<UserEntity, UserDto>().Map(d => d.DeptName, s => s.Dept.DeptName, s => s.Dept != null);
-    //    }
-    //}
+    public class UserDtoRegister : IRegister
+    {
+        public void Register(TypeAdapterConfig config)
+        {
+            config.ForType<UserEntity, UserDto>().Map(d => d.DeptName, s => s.Dept.DeptName, s => s.Dept != null);
+        }
+    }
     #endregion
 
     #region 数据传输对象 UserDto
@@ -57,12 +58,20 @@ namespace FeiNuo.Admin.Services.System
         public int DeptId { get; set; }
 
         /// <summary>
+        /// 部门ID
+        /// </summary>
+        [Description("部门名称")]
+        public string? DeptName { get; set; }
+
+        /// <summary>
         /// 性别：M/F/O
         /// </summary>
         [Description("性别：M/F/O")]
         [Required(ErrorMessage = "【性别：M/F/O】不能为空")]
         [StringLength(1, ErrorMessage = "【性别：M/F/O】长度不能超过 1。")]
         public string Gender { get; set; } = null!;
+
+        public string GenderName { get { return Gender == "M" ? "男" : Gender == "F" ? "女" : "保密"; } }
 
         /// <summary>
         /// 手机号码
@@ -87,10 +96,15 @@ namespace FeiNuo.Admin.Services.System
         public string? Avatar { get; set; }
 
         /// <summary>
-        /// 用户状态:正常，锁定，密码过期等
+        /// 用户状态：0正常/1作废
         /// </summary>
         [Description("用户状态:正常，锁定，密码过期等")]
         public StatusEnum Status { get; set; }
+
+        /// <summary>
+        /// 用户状态名称
+        /// </summary>
+        public string StatusName { get { return Status.GetDescription(); } }
 
         /// <summary>
         /// 自我介绍
@@ -118,14 +132,20 @@ namespace FeiNuo.Admin.Services.System
         /// <summary>
         /// 是否作废
         /// </summary>
-        public bool? Status { get; set; }
+        public byte? Status { get; set; }
+
+        /// <summary>
+        /// 部门ID
+        /// </summary>
+        public int? DeptId { get; set; }
 
         /// <summary>
         /// 根据查询条件添加查询表达式
         /// </summary>
         protected override void MergeQueryExpression()
         {
-            // AddExpression(Disabled.HasValue, r => r.Disabled == Disabled!.Value);
+            AddExpression(Status.HasValue, r => r.Status == Status!.Value);
+            AddExpression(DeptId.HasValue, r => r.DeptId == DeptId!.Value);
             // AddExpression(RoleCode, r => r.RoleCode == RoleCode);
             // AddSearchExpression(s => o => o.RoleCode.Contains(s) || o.RoleName.Contains(s));
             AddDateExpression(s => o => o.CreateTime >= s, e => o => o.CreateTime <= e);

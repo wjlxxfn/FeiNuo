@@ -43,8 +43,8 @@
 <#
     }
 #>
-    tc('CreateBy', '创建人', 'center'),
-    tc('CreateTime', '创建时间', 'center'),
+    tc('createBy', '创建人', 'center'),
+    tc('createTime', '创建时间', 'center'),
     tc('action', '操作', 'center'),
   ];
   // 加载数据
