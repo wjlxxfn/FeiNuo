@@ -34,8 +34,8 @@
       <!-- 操作 -->
       <q-separator />
       <q-card-actions align="right">
-        <q-btn label="取消" outline @click="onDialogCancel" />
-        <q-btn label="确定" color="primary" icon="save" :loading="loading" @click="formRef?.submit()" />
+        <q-btn label="取 消" outline @click="onDialogCancel" />
+        <q-btn label="确 定" color="primary" :loading="loading" @click="formRef?.submit()" />
       </q-card-actions>
     </q-card>
   </q-dialog>

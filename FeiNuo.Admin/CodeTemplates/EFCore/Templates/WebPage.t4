@@ -5,7 +5,7 @@
     <q-toolbar class="search-bar">
       <q-table-filter :query="query" @change="handleQuery()"></q-table-filter>
       <q-space />
-      <q-btn label="新增" color="primary" icon="create" @click="handleAdd" />
+      <q-btn label="新增" color="primary" icon="create" @click="handleAdd()" />
       <q-btn label="删除" color="error" icon="delete" :disable="!hasSelected" @click="handleDelete()" />
       <q-btn label="导出" color="warning" icon="export" :loading="exportLoading" @click="handleExport" />
     </q-toolbar>

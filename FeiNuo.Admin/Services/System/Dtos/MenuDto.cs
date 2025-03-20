@@ -46,22 +46,21 @@ namespace FeiNuo.Admin.Services.System
         /// </summary>
         [Description("菜单类型")]
         public int MenuType { get; set; }
+        public string MenuTypeName { get { return ((MenuTypeEnum)MenuType).GetDescription(); } }
 
         /// <summary>
         /// 菜单地址
         /// </summary>
         [Description("菜单地址")]
-        [Required(ErrorMessage = "【菜单地址】不能为空")]
         [StringLength(200, ErrorMessage = "【菜单地址】长度不能超过 200。")]
-        public string MenuPath { get; set; } = null!;
+        public string MenuPath { get; set; } = "";
 
         /// <summary>
         /// 权限标识
         /// </summary>
         [Description("权限标识")]
-        [Required(ErrorMessage = "【权限标识】不能为空")]
         [StringLength(200, ErrorMessage = "【权限标识】长度不能超过 200。")]
-        public string Permission { get; set; } = null!;
+        public string Permission { get; set; } = "";
 
         /// <summary>
         /// 排序号
@@ -87,7 +86,7 @@ namespace FeiNuo.Admin.Services.System
         /// 下级菜单
         /// </summary>
 		[Description("下级菜单")]
-        public List<MenuDto>? Children { get; set; }
+        public List<MenuDto>? Children { get; set; } = [];
     }
     #endregion
 

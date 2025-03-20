@@ -121,7 +121,8 @@ public class DbInitializer
             MenuPath = path,
             Permission = permission,
             SortNo = (short)sortNo,
-            Icon = icon,
+            // 图标在前端使用路由中配置的图标，这里不需要设置了
+            //Icon = icon,
         };
         menu.Children = children ?? [];
         //if (type == MenuTypeEnum.Menu && permission != "")

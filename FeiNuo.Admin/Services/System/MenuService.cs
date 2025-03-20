@@ -23,18 +23,37 @@ namespace FeiNuo.Admin.Services.System
         /// </summary>
         public async Task<List<MenuDto>> GetMenuTree()
         {
-            var menus = await ctx.Menus.OrderBy(a => a.SortNo).ToListAsync();
-            return [.. menus.Where(a => a.Parent == null).Select(a => a.Adapt<MenuDto>())];
+            var menus = await ctx.Menus.AsNoTracking().ToListAsync();
+            // 生成树形结构
+            var menuTree = BuildMenuTree(menus);
+            return menuTree.Adapt<List<MenuDto>>();
         }
 
-        /// <summary>
-        /// 分页查询
-        /// </summary>
-        public async Task<PageResult<MenuDto>> FindPagedList(MenuQuery query, Pager pager, LoginUser user)
+        // 根据菜单集合生成树形结构
+        private static List<MenuEntity> BuildMenuTree(List<MenuEntity> menus)
         {
-            var dbSet = ctx.Menus.AsNoTracking().Where(query.GetQueryExpression());
-            var lstData = await PageHelper.FindPagedList(dbSet, pager, o => o.OrderByDescending(t => t.CreateTime));
-            return lstData.Map(o => o.Adapt<MenuDto>());
+            var tree = new List<MenuEntity>();
+            foreach (var menu in menus)
+            {
+                if (menu.ParentId == null)
+                {
+                    tree.Add(menu);
+                }
+                else
+                {
+                    var parent = menus.FirstOrDefault(a => a.MenuId == menu.ParentId);
+                    if (parent == null)
+                    {
+                        tree.Add(menu);
+                    }
+                    else
+                    {
+                        parent.Children ??= [];
+                        parent.Children.Add(menu);
+                    }
+                }
+            }
+            return tree;
         }
 
         /// <summary>
@@ -45,6 +64,7 @@ namespace FeiNuo.Admin.Services.System
             var entity = await FindByIdAsync(menuId);
             return entity.Adapt<MenuDto>();
         }
+
         private async Task<MenuEntity> FindByIdAsync(int menuId)
         {
             return await ctx.Menus.FindAsync(menuId) ?? throw new NotFoundException($"找不到指定数据,Id:{menuId},Type:{typeof(MenuEntity)}");
@@ -86,10 +106,10 @@ namespace FeiNuo.Admin.Services.System
         /// </summary>
         private async Task CopyDtoToEntity(MenuDto dto, MenuEntity entity, LoginUser user, bool isNew)
         {
-            //TODO 检查数据重复
-            if (await ctx.Menus.AnyAsync(a => a.MenuId != dto.MenuId /* && (a.Name == dto.Name )*/))
+            // 检查数据重复
+            if (await ctx.Menus.AnyAsync(a => a.MenuId != dto.MenuId && (a.ParentId == dto.ParentId && a.MenuName == dto.MenuName)))
             {
-                throw new MessageException("当前已存在相同名称或编码的菜单");
+                throw new MessageException("当前已存在相同名称的菜单");
             }
 
             // 复制属性
@@ -104,14 +124,18 @@ namespace FeiNuo.Admin.Services.System
         /// </summary>
         public async Task DeleteMenuByIds(IEnumerable<int> ids, LoginUser user)
         {
-            var menus = await ctx.Menus.Where(a => ids.Contains(a.MenuId)).ToListAsync();
+            var menus = await ctx.Menus.Include(a => a.Children).Include(a => a.Roles).Where(a => ids.Contains(a.MenuId)).ToListAsync();
             if (menus.Count != ids.Count())
             {
                 throw new MessageException("查询出的数据和传入的ID不匹配，请刷新后再试。");
             }
-            foreach (var menu in menus)
+            foreach (var menu in menus.OrderByDescending(a => a.MenuId))
             {
-                //TODO 判断是否能删除
+                if (menu.Children.Count > 0)
+                {
+                    throw new MessageException("请先删除子菜单");
+                }
+                menu.Roles.Clear();
                 ctx.Menus.Remove(menu);
             }
             // 提交事务

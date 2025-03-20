@@ -31,16 +31,6 @@ namespace FeiNuo.Admin.Controllers.System
         }
 
         /// <summary>
-        /// 分页查询
-        /// </summary>
-        [HttpGet]
-        [EndpointSummary("分页查询")]
-        public async Task<PageResult<MenuDto>> GetMenuList([FromQuery] MenuQuery query, [FromQuery] Pager pager)
-        {
-            return await service.FindPagedList(query, pager, CurrentUser);
-        }
-
-        /// <summary>
         /// 主键查询
         /// </summary>
         /// <param name="menuId">主键ID</param>
@@ -49,30 +39,6 @@ namespace FeiNuo.Admin.Controllers.System
         public async Task<MenuDto> GetMenu(int menuId)
         {
             return await service.GetMenu(menuId);
-        }
-
-        /// <summary>
-        /// 导出Excel
-        /// </summary>
-        [HttpGet("export")]
-        [EndpointSummary("导出Excel")]
-        public async Task<ActionResult> ExportMenus([FromQuery] MenuQuery query)
-        {
-            var pager = await service.FindPagedList(query, Pager.Unpaged, CurrentUser);
-            var excel = new ExcelConfig($"菜单导出{DateTime.Now:yyyyMMddHHmmss}.xlsx", pager.DataList, [
-                new ExcelColumn<MenuDto>("上级ID", d => d.ParentId, 15),
-                new ExcelColumn<MenuDto>("菜单名称", d => d.MenuName, 15),
-                new ExcelColumn<MenuDto>("菜单类型", d => d.MenuType, 15),
-                new ExcelColumn<MenuDto>("菜单地址", d => d.MenuPath, 15),
-                new ExcelColumn<MenuDto>("权限标识", d => d.Permission, 15),
-                new ExcelColumn<MenuDto>("排序号", d => d.SortNo, 15),
-                new ExcelColumn<MenuDto>("菜单图标", d => d.Icon, 15),
-                new ExcelColumn<MenuDto>("备注说明", d => d.Remark, 15),
-                new ExcelColumn<MenuDto>("创建人", d => d.CreateBy, 15),
-                new ExcelColumn<MenuDto>("创建时间", d => d.CreateTime, 15),
-            ]);
-            var bytes = PoiHelper.GetExcelBytes(excel);
-            return File(bytes, excel.ContentType, excel.FileName);
         }
         #endregion
 
