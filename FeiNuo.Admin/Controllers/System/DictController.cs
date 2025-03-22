@@ -48,15 +48,23 @@ namespace FeiNuo.Admin.Controllers.System
         [EndpointSummary("导出Excel")]
         public async Task<ActionResult> ExportDicts([FromQuery] DictQuery query)
         {
-            var pager = await service.FindPagedList(query, Pager.Unpaged, CurrentUser);
-            var excel = new ExcelConfig($"数据字典导出{DateTime.Now:yyyyMMddHHmmss}.xlsx", pager.DataList, [
-                new ExcelColumn<DictDto>("字典类型", d => d.DictType),
-                new ExcelColumn<DictDto>("字典名称", d => d.DictName),
-                new ExcelColumn<DictDto>("备注说明", d => d.Remark),
-                new ExcelColumn<DictDto>("创建人", d => d.CreateBy),
-                new ExcelColumn<DictDto>("创建时间", d => d.CreateTime),
+            var pager = await service.FindPagedList(query, Pager.Unpaged, CurrentUser, true);
+            var data = pager.DataList.SelectMany(a => a.DictItems);
+            var excel = new ExcelConfig($"数据字典导出{DateTime.Now:yyyyMMddHHmmss}", data, [
+                new ExcelColumn<DictItemDto>("字典类型", v => v.DictType),
+                new ExcelColumn<DictItemDto>("字典名称", v => v.DictName),
+                new ExcelColumn<DictItemDto>("字典项#字典标签", v => v.DictLabel),
+                new ExcelColumn<DictItemDto>("字典项#字典键值", v => v.DictValue),
+                new ExcelColumn<DictItemDto>("字典项#其他配置", v => v.ExtValue),
+                new ExcelColumn<DictItemDto>("字典项#排序", v => v.SortNo),
+                new ExcelColumn<DictItemDto>("字典项#状态", v => v.Disabled ? "作废" : "正常"),
+                new ExcelColumn<DictItemDto>("字典项#备注", v => v.Remark),
             ]);
-            var bytes = PoiHelper.GetExcelBytes(excel);
+            var wb = PoiHelper.CreateWorkbook(excel, out var style);
+            PoiHelper.AutoMergeRows(wb.GetSheetAt(0), 0, 2);
+            PoiHelper.AutoMergeRows(wb.GetSheetAt(0), 1, 2);
+
+            var bytes = PoiHelper.GetExcelBytes(wb);
             return File(bytes, excel.ContentType, excel.FileName);
         }
         #endregion

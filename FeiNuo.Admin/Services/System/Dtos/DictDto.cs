@@ -12,6 +12,9 @@ namespace FeiNuo.Admin.Services.System
         {
             config.ForType<DictEntity, DictDto>().Map(d => d.DictItems, s => s.DictItems.Adapt<List<DictItemDto>>(), s => s.DictItems != null);
             config.ForType<DictDto, DictEntity>().Ignore(a => a.DictItems);
+
+            config.ForType<DictItemEntity, DictItemDto>().Map(d => d.DictType, s => s.Dict.DictType, s => s.Dict != null);
+            config.ForType<DictItemEntity, DictItemDto>().Map(d => d.DictName, s => s.Dict.DictName, s => s.Dict != null);
         }
     }
     #endregion
@@ -118,6 +121,10 @@ namespace FeiNuo.Admin.Services.System
         [Description("备注说明")]
         [StringLength(200, ErrorMessage = "【备注说明】长度不能超过 200。")]
         public string? Remark { get; set; }
+
+
+        public string? DictType { get; set; }
+        public string? DictName { get; set; }
 
     }
     #endregion
