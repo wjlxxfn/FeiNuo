@@ -143,7 +143,9 @@ namespace FeiNuo.Admin.Services.System
             }
             foreach (var dict in dicts)
             {
-                dict.DictItems.Clear();
+                // 删除字典明细
+                ctx.DictItems.RemoveRange(dict.DictItems);
+                // 删除字典
                 ctx.Dicts.Remove(dict);
             }
             // 提交事务
