@@ -27,14 +27,14 @@ public class Program
             // 注入 Serilog
             builder.Host.UseSerilog((context, services, configuration) =>
             {
-                var logBase = "./Logs";
+                var logBase = $"./Logs/{DateTime.Now.ToString("yyyy-MM")}";
                 configuration.MinimumLevel.Information()
                     .MinimumLevel.Override("System", LogEventLevel.Warning)
                     .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
                     .MinimumLevel.Override("Microsoft.Hosting.Lifetime", LogEventLevel.Warning)
                     .WriteTo.Console(outputTemplate: AppConstants.LOG_FORMAT_CONSOLE)
-                    .WriteTo.Logger(c => c.Filter.ByIncludingOnly(d => d.Level == LogEventLevel.Information).WriteTo.File($"{logBase}/Log-Info-.log", restrictedToMinimumLevel: LogEventLevel.Information, rollingInterval: RollingInterval.Day, outputTemplate: AppConstants.LOG_FORMAT_FILE, fileSizeLimitBytes: 104857600))
-                    .WriteTo.File($"{logBase}/Log-Warning-.log", restrictedToMinimumLevel: LogEventLevel.Warning, rollingInterval: RollingInterval.Day, outputTemplate: AppConstants.LOG_FORMAT_FILE, fileSizeLimitBytes: 104857600)
+                    //.WriteTo.Logger(c => c.Filter.ByIncludingOnly(d => d.Level == LogEventLevel.Information).WriteTo.File($"{logBase}/Log-Info-.log", restrictedToMinimumLevel: LogEventLevel.Information, rollingInterval: RollingInterval.Day, outputTemplate: AppConstants.LOG_FORMAT_FILE, fileSizeLimitBytes: 104857600))
+                    .WriteTo.File($"{logBase}/Log-.log", restrictedToMinimumLevel: LogEventLevel.Warning, rollingInterval: RollingInterval.Day, outputTemplate: AppConstants.LOG_FORMAT_FILE, fileSizeLimitBytes: 104857600)
                     .ReadFrom.Configuration(context.Configuration)
                     .Enrich.FromLogContext();
             });
