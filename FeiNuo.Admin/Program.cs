@@ -27,7 +27,7 @@ public class Program
             // 注入 Serilog
             builder.Host.UseSerilog((context, services, configuration) =>
             {
-                var logBase = $"./Logs/{DateTime.Now.ToString("yyyy-MM")}";
+                var logBase = $"./Logs/{DateTime.Now:yyyy-MM}";
                 configuration.MinimumLevel.Information()
                     .MinimumLevel.Override("System", LogEventLevel.Warning)
                     .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
@@ -40,12 +40,13 @@ public class Program
             });
             // 注入 EFCore
             //var conn = builder.Configuration.GetConnectionString("MySql");
-            var conn = builder.Configuration.GetConnectionString("SqlServer");
+            //var conn = builder.Configuration.GetConnectionString("SqlServer");
+            var conn = builder.Configuration.GetConnectionString("PgSql");
             builder.Services.AddDbContext<FNDbContext>(opt =>
             {
                 // opt.UseMySql(conn, ServerVersion.Parse("8.0.26-mysql"), ops => ops.TranslateParameterizedCollectionsToConstants());
-                opt.UseSqlServer(conn);
-
+                //opt.UseSqlServer(conn);
+                opt.UseNpgsql(conn);
                 if (builder.Environment.IsDevelopment())
                 {
                     opt.EnableSensitiveDataLogging();

@@ -256,7 +256,7 @@ public partial class <#= EntityType.Name #>Configuration : IEntityTypeConfigurat
             genPropCodes = genPropCodes.Replace(".HasDefaultValueSql(\"''::character varying\")",".HasDefaultValue(\"\")");
             genPropCodes = genPropCodes.Replace(".HasDefaultValueSql(\"''::text\")",".HasDefaultValue(\"\")");
             genPropCodes = genPropCodes.Replace(".HasColumnType(\"timestamp without time zone\")","");
-            genPropCodes = genPropCodes.Replace(".IsUnicode(false)");
+            genPropCodes = genPropCodes.Replace(".IsUnicode(false)","");
 
 #>
         entity.Property(e => e.<#= property.Name #>)<#= genPropCodes #>;
