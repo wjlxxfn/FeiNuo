@@ -38,7 +38,7 @@ public partial class UserEntity : BaseEntity
     /// <summary>
     /// 性别：M/F/O
     /// </summary>
-    public string Gender { get; set; } = null!;
+    public char Gender { get; set; }
 
     /// <summary>
     /// 手机号码
@@ -58,7 +58,7 @@ public partial class UserEntity : BaseEntity
     /// <summary>
     /// 用户状态：0正常/1作废
     /// </summary>
-    public byte Status { get; set; }
+    public short Status { get; set; }
 
     /// <summary>
     /// 自我介绍
@@ -91,20 +91,20 @@ public partial class UserConfiguration : IEntityTypeConfiguration<UserEntity>
         entity.HasIndex(e => e.Username, "uk_sys_user_username").IsUnique();
 
         entity.Property(e => e.UserId).HasColumnName("user_id").HasComment("用户ID");
-        entity.Property(e => e.Username).HasColumnName("username").HasComment("登录用户名").HasMaxLength(50).IsUnicode(false);
+        entity.Property(e => e.Username).HasColumnName("username").HasComment("登录用户名").HasMaxLength(50);
         entity.Property(e => e.Nickname).HasColumnName("nickname").HasComment("用户昵称").HasMaxLength(50);
-        entity.Property(e => e.Password).HasColumnName("password").HasComment("登录密码").HasMaxLength(50).IsUnicode(false);
+        entity.Property(e => e.Password).HasColumnName("password").HasComment("登录密码").HasMaxLength(50);
         entity.Property(e => e.DeptId).HasColumnName("dept_id").HasComment("部门ID");
-        entity.Property(e => e.Gender).HasColumnName("gender").HasComment("性别：M/F/O").IsFixedLength().HasMaxLength(1).IsUnicode(false);
-        entity.Property(e => e.Cellphone).HasColumnName("cellphone").HasComment("手机号码").HasMaxLength(20).IsUnicode(false);
-        entity.Property(e => e.Email).HasColumnName("email").HasComment("电子邮箱").HasMaxLength(100).IsUnicode(false);
-        entity.Property(e => e.Avatar).HasColumnName("avatar").HasComment("头像").HasMaxLength(200).IsUnicode(false);
+        entity.Property(e => e.Gender).HasColumnName("gender").HasComment("性别：M/F/O").IsFixedLength();
+        entity.Property(e => e.Cellphone).HasColumnName("cellphone").HasComment("手机号码").HasMaxLength(20);
+        entity.Property(e => e.Email).HasColumnName("email").HasComment("电子邮箱").HasMaxLength(100);
+        entity.Property(e => e.Avatar).HasColumnName("avatar").HasComment("头像").HasMaxLength(200);
         entity.Property(e => e.Status).HasColumnName("status").HasComment("用户状态：0正常/1作废");
         entity.Property(e => e.Introduction).HasColumnName("introduction").HasComment("自我介绍").HasMaxLength(500);
         entity.Property(e => e.Remark).HasColumnName("remark").HasComment("备注").HasMaxLength(200);
-        entity.Property(e => e.CreateBy).HasColumnName("create_by").HasComment("创建人").HasMaxLength(50).IsUnicode(false);
+        entity.Property(e => e.CreateBy).HasColumnName("create_by").HasComment("创建人").HasMaxLength(50);
         entity.Property(e => e.CreateTime).HasColumnName("create_time").HasComment("创建时间");
-        entity.Property(e => e.UpdateBy).HasColumnName("update_by").HasComment("修改人").HasMaxLength(50).IsUnicode(false);
+        entity.Property(e => e.UpdateBy).HasColumnName("update_by").HasComment("修改人").HasMaxLength(50);
         entity.Property(e => e.UpdateTime).HasColumnName("update_time").HasComment("修改时间");
 
         entity.HasOne(d => d.Dept).WithMany(p => p.Users)

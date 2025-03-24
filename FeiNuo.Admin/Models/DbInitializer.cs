@@ -74,10 +74,10 @@ public class DbInitializer
         #endregion
 
         #region 角色数据
-        menus = ctx.Menus.ToList();
+        menus = [.. ctx.Menus];
         var roleSuper = NewRole("SuperAdmin", "超级管理员", "超级管理员，拥有所有权限，系统内置，不允许编辑删除", menus);
-        var roleAdmin = NewRole("admin", "管理员", "普通管理员", menus.Where(a => !a.Permission.StartsWith("monitor")).ToList());
-        var roleWjl = NewRole("wjl", "wjl", "wjl专用角色", menus.Where(a => a.Permission == "" || a.Permission.StartsWith("system")).ToList());
+        var roleAdmin = NewRole("admin", "管理员", "普通管理员", menus.Where(a => !a.Permission.StartsWith("monitor")));
+        var roleWjl = NewRole("wjl", "wjl", "wjl专用角色", menus.Where(a => a.Permission == "" || a.Permission.StartsWith("system")));
         var roleTest = NewRole("test", "test", "测试用");
         ctx.Roles.AddRange(roleSuper, roleAdmin, roleWjl, roleTest);
         #endregion
@@ -128,17 +128,15 @@ public class DbInitializer
     {
         string path = type == MenuTypeEnum.Button ? "" : code.StartsWith("http") ? code : "/" + code.Replace(".", "/");
         string permission = code.StartsWith("http") ? "" : code.Replace(".", ":");
-        var menu = new MenuEntity()
+        var menu = new MenuEntity
         {
             MenuType = (int)type,
             MenuName = name,
             MenuPath = path,
             Permission = permission,
             SortNo = (short)sortNo,
-            // 图标在前端使用路由中配置的图标，这里不需要设置了
-            //Icon = icon,
+            Children = children ?? []
         };
-        menu.Children = children ?? [];
         //if (type == MenuTypeEnum.Menu && permission != "")
         //{
         //    menu.Children.Add(NewMenu(MenuTypeEnum.Button, "新增", $"{permission}.create", 1));
@@ -156,19 +154,19 @@ public class DbInitializer
         };
         if (children != null)
         {
-            dept.Children = children.ToList();
+            dept.Children = [.. children];
         }
         return Audit(dept);
     }
-    private static RoleEntity NewRole(string roleCode, string roleName, string remark, List<MenuEntity>? menus = null)
+    private static RoleEntity NewRole(string roleCode, string roleName, string remark, IEnumerable<MenuEntity>? menus = null)
     {
-        var role = new RoleEntity()
+        var role = new RoleEntity
         {
             RoleCode = roleCode,
             RoleName = roleName,
-            Remark = remark
+            Remark = remark,
+            Menus = [.. menus ?? []]
         };
-        role.Menus = menus ?? [];
         return Audit(role);
     }
     private static UserEntity NewUser(string username, string nickname, List<RoleEntity> roles)
@@ -183,7 +181,7 @@ public class DbInitializer
             DeptId = 1,
             Nickname = nickname,
             Cellphone = "16666666666",
-            Gender = "O",
+            Gender = 'O',
             Email = "wjlxxfn@gmail.com",
             Avatar = avatar
         };

@@ -7,7 +7,10 @@ public partial class FNDbContext
     // 全局配置
     protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
     {
-        //configurationBuilder.Properties<string>().AreUnicode(false);
+        // pgsql 时间戳类型
+        // configurationBuilder.Properties<DateTime>().HaveColumnType("timestamp");
+        configurationBuilder.Properties<string>().AreUnicode(false);
+        configurationBuilder.Properties<char>().AreUnicode(false);
     }
 
     /// <summary>
@@ -24,15 +27,16 @@ public partial class FNDbContext
         modelBuilder.Entity<DictItemEntity>().Ignore(a => a.CreateBy).Ignore(a => a.CreateTime).Ignore(a => a.UpdateBy).Ignore(a => a.UpdateTime);
 
         // 批量覆盖配置
-        //foreach (var entityType in modelBuilder.Model.GetEntityTypes())
-        //{
-        //    foreach (var propertyInfo in entityType.ClrType.GetProperties())
-        //    {
-        //        if (propertyInfo.Name.ToLower() == "remark" || propertyInfo.Name.ToLower() == "description" || propertyInfo.Name.EndsWith("name"))
-        //        {
-        //            entityType.FindProperty(propertyInfo.Name)?.SetIsUnicode(true);
-        //        }
-        //    }
-        //}
+        foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+        {
+            foreach (var propertyInfo in entityType.ClrType.GetProperties())
+            {
+                var p = propertyInfo.Name.ToLower();
+                if (p.EndsWith("remark") || p == "description" || p == "introduction" || p.EndsWith("name"))
+                {
+                    entityType.FindProperty(propertyInfo.Name)?.SetIsUnicode(true);
+                }
+            }
+        }
     }
 }

@@ -79,14 +79,14 @@ public partial class MenuConfiguration : IEntityTypeConfiguration<MenuEntity>
         entity.Property(e => e.ParentId).HasColumnName("parent_id").HasComment("上级ID");
         entity.Property(e => e.MenuName).HasColumnName("menu_name").HasComment("菜单名称").HasMaxLength(50);
         entity.Property(e => e.MenuType).HasColumnName("menu_type").HasComment("菜单类型");
-        entity.Property(e => e.MenuPath).HasColumnName("menu_path").HasComment("菜单地址").HasMaxLength(200).IsUnicode(false);
-        entity.Property(e => e.Permission).HasColumnName("permission").HasComment("权限标识").HasDefaultValue("").HasMaxLength(200).IsUnicode(false);
+        entity.Property(e => e.MenuPath).HasColumnName("menu_path").HasComment("菜单地址").HasMaxLength(200);
+        entity.Property(e => e.Permission).HasColumnName("permission").HasComment("权限标识").HasDefaultValue("").HasMaxLength(200);
         entity.Property(e => e.SortNo).HasColumnName("sort_no").HasComment("排序号");
-        entity.Property(e => e.Icon).HasColumnName("icon").HasComment("菜单图标").HasMaxLength(500).IsUnicode(false);
+        entity.Property(e => e.Icon).HasColumnName("icon").HasComment("菜单图标").HasMaxLength(500);
         entity.Property(e => e.Remark).HasColumnName("remark").HasComment("备注说明").HasMaxLength(200);
-        entity.Property(e => e.CreateBy).HasColumnName("create_by").HasComment("创建人").HasMaxLength(50).IsUnicode(false);
+        entity.Property(e => e.CreateBy).HasColumnName("create_by").HasComment("创建人").HasMaxLength(50);
         entity.Property(e => e.CreateTime).HasColumnName("create_time").HasComment("创建时间");
-        entity.Property(e => e.UpdateBy).HasColumnName("update_by").HasComment("修改人").HasMaxLength(50).IsUnicode(false);
+        entity.Property(e => e.UpdateBy).HasColumnName("update_by").HasComment("修改人").HasMaxLength(50);
         entity.Property(e => e.UpdateTime).HasColumnName("update_time").HasComment("修改时间");
 
         entity.HasOne(d => d.Parent).WithMany(p => p.Children)

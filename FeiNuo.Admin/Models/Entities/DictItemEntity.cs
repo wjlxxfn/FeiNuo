@@ -69,8 +69,8 @@ public partial class DictItemConfiguration : IEntityTypeConfiguration<DictItemEn
         entity.Property(e => e.DictItemId).HasColumnName("dict_item_id").HasComment("字典项主键");
         entity.Property(e => e.DictId).HasColumnName("dict_id").HasComment("字典主键");
         entity.Property(e => e.DictLabel).HasColumnName("dict_label").HasComment("字典标签").HasMaxLength(50);
-        entity.Property(e => e.DictValue).HasColumnName("dict_value").HasComment("字典键值").HasMaxLength(200).IsUnicode(false);
-        entity.Property(e => e.ExtValue).HasColumnName("ext_value").HasComment("其他配置").HasMaxLength(500).IsUnicode(false);
+        entity.Property(e => e.DictValue).HasColumnName("dict_value").HasComment("字典键值").HasMaxLength(200);
+        entity.Property(e => e.ExtValue).HasColumnName("ext_value").HasComment("其他配置").HasMaxLength(500);
         entity.Property(e => e.SortNo).HasColumnName("sort_no").HasComment("排序序号");
         entity.Property(e => e.Disabled).HasColumnName("disabled").HasComment("字典状态");
         entity.Property(e => e.Remark).HasComment("备注说明").HasMaxLength(200);

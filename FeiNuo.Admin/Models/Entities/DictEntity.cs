@@ -45,12 +45,12 @@ public partial class DictConfiguration : IEntityTypeConfiguration<DictEntity>
         entity.ToTable("sys_dict", tb => tb.HasComment("数据字典"));
 
         entity.Property(e => e.DictId).HasColumnName("dict_id").HasComment("字典主键");
-        entity.Property(e => e.DictType).HasColumnName("dict_type").HasComment("字典类型").HasMaxLength(50).IsUnicode(false);
+        entity.Property(e => e.DictType).HasColumnName("dict_type").HasComment("字典类型").HasMaxLength(50);
         entity.Property(e => e.DictName).HasColumnName("dict_name").HasComment("字典名称").HasMaxLength(50);
         entity.Property(e => e.Remark).HasColumnName("remark").HasComment("备注说明").HasMaxLength(200);
-        entity.Property(e => e.CreateBy).HasColumnName("create_by").HasComment("创建人").HasMaxLength(50).IsUnicode(false);
+        entity.Property(e => e.CreateBy).HasColumnName("create_by").HasComment("创建人").HasMaxLength(50);
         entity.Property(e => e.CreateTime).HasColumnName("create_time").HasComment("创建时间");
-        entity.Property(e => e.UpdateBy).HasColumnName("update_by").HasComment("修改人").HasMaxLength(50).IsUnicode(false);
+        entity.Property(e => e.UpdateBy).HasColumnName("update_by").HasComment("修改人").HasMaxLength(50);
         entity.Property(e => e.UpdateTime).HasColumnName("update_time").HasComment("修改时间");
 
         OnConfigurePartial(entity);

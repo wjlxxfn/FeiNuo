@@ -28,7 +28,7 @@ public partial class RoleEntity : BaseEntity
     /// <summary>
     /// 角色状态：0正常/1作废
     /// </summary>
-    public byte Status { get; set; }
+    public short Status { get; set; }
 
     /// <summary>
     /// 备注说明
@@ -52,13 +52,13 @@ public partial class RoleConfiguration : IEntityTypeConfiguration<RoleEntity>
         entity.ToTable("sys_role", tb => tb.HasComment("角色"));
 
         entity.Property(e => e.RoleId).HasColumnName("role_id").HasComment("角色ID");
-        entity.Property(e => e.RoleCode).HasColumnName("role_code").HasComment("角色编码").HasMaxLength(50).IsUnicode(false);
+        entity.Property(e => e.RoleCode).HasColumnName("role_code").HasComment("角色编码").HasMaxLength(50);
         entity.Property(e => e.RoleName).HasColumnName("role_name").HasComment("角色名称").HasMaxLength(50);
         entity.Property(e => e.Status).HasColumnName("status").HasComment("角色状态：0正常/1作废");
         entity.Property(e => e.Remark).HasColumnName("remark").HasComment("备注说明").HasMaxLength(200);
-        entity.Property(e => e.CreateBy).HasColumnName("create_by").HasComment("创建人").HasMaxLength(50).IsUnicode(false);
+        entity.Property(e => e.CreateBy).HasColumnName("create_by").HasComment("创建人").HasMaxLength(50);
         entity.Property(e => e.CreateTime).HasColumnName("create_time").HasComment("创建时间");
-        entity.Property(e => e.UpdateBy).HasColumnName("update_by").HasComment("修改人").HasMaxLength(50).IsUnicode(false);
+        entity.Property(e => e.UpdateBy).HasColumnName("update_by").HasComment("修改人").HasMaxLength(50);
         entity.Property(e => e.UpdateTime).HasColumnName("update_time").HasComment("修改时间");
 
         entity.HasMany(d => d.Menus).WithMany(p => p.Roles)
