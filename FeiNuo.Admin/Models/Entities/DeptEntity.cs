@@ -67,9 +67,9 @@ public partial class DeptConfiguration : IEntityTypeConfiguration<DeptEntity>
         entity.Property(e => e.Status).HasColumnName("status").HasComment("部门状态：0正常/1作废");
         entity.Property(e => e.Remark).HasColumnName("remark").HasComment("备注说明").HasMaxLength(200);
         entity.Property(e => e.CreateBy).HasColumnName("create_by").HasComment("创建人").HasMaxLength(50);
-        entity.Property(e => e.CreateTime).HasColumnName("create_time").HasComment("创建时间");
+        entity.Property(e => e.CreateTime).HasColumnName("create_time").HasComment("创建时间").HasMaxLength(6);
         entity.Property(e => e.UpdateBy).HasColumnName("update_by").HasComment("修改人").HasMaxLength(50);
-        entity.Property(e => e.UpdateTime).HasColumnName("update_time").HasComment("修改时间");
+        entity.Property(e => e.UpdateTime).HasColumnName("update_time").HasComment("修改时间").HasMaxLength(6);
 
         entity.HasOne(d => d.Parent).WithMany(p => p.Children)
             .HasForeignKey(d => d.ParentId)

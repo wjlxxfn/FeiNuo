@@ -181,7 +181,7 @@ public class DbInitializer
             DeptId = 1,
             Nickname = nickname,
             Cellphone = "16666666666",
-            Gender = 'O',
+            Gender = "O",
             Email = "wjlxxfn@gmail.com",
             Avatar = avatar
         };

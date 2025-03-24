@@ -27,7 +27,7 @@ public class Program
             // 注入 Serilog
             builder.Host.UseSerilog((context, services, configuration) =>
             {
-                var logBase = $"./Logs/{DateTime.Now.ToString("yyyy-MM")}";
+                var logBase = $"./Logs/{DateTime.Now:yyyy-MM}";
                 configuration.MinimumLevel.Information()
                     .MinimumLevel.Override("System", LogEventLevel.Warning)
                     .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
@@ -39,12 +39,15 @@ public class Program
                     .Enrich.FromLogContext();
             });
             // 注入 EFCore
-            //var conn = builder.Configuration.GetConnectionString("MySql");
-            var conn = builder.Configuration.GetConnectionString("SqlServer");
+            var conn = builder.Configuration.GetConnectionString("PgSql");
             builder.Services.AddDbContext<FNDbContext>(opt =>
             {
-                // opt.UseMySql(conn, ServerVersion.Parse("8.0.26-mysql"), ops => ops.TranslateParameterizedCollectionsToConstants());
-                opt.UseSqlServer(conn);
+                //opt.UseMySql(conn, ServerVersion.Parse("8.0.26-mysql"), ops => ops.TranslateParameterizedCollectionsToConstants());
+                opt.UseNpgsql(conn);
+
+                // 解决 DateTimeOffset 转换问题
+                AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+                AppContext.SetSwitch("Npgsql.DisableDateTimeInfinityConversions", true);
 
                 if (builder.Environment.IsDevelopment())
                 {
@@ -52,7 +55,6 @@ public class Program
                     opt.EnableDetailedErrors();
                 }
             });
-
             // 注入认证授权
             builder.Services.AddFNAspNetCore(builder.Configuration);
 

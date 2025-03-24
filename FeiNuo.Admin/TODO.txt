@@ -1,0 +1,7 @@
+﻿主功能尚未完成
+日志查看功能
+
+1、调整文件结构，Services按照模块划分，dto,service都放到对应的模块下。考虑controller要不要也一起放？
+2、前端考虑不在要api,而是直接使用路径，但仍需要dto类型
+3、导入Excel测试
+4、前后端项目合并到一个git ?   使用DockerCompose 一起运行所有项目

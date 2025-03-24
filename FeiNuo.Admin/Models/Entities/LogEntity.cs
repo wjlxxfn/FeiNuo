@@ -97,7 +97,7 @@ public partial class LogConfiguration : IEntityTypeConfiguration<LogEntity>
         entity.Property(e => e.ClientOs).HasColumnName("client_os").HasComment("客户端操作系统").HasMaxLength(50);
         entity.Property(e => e.ClientBrowser).HasColumnName("client_browser").HasComment("客户端浏览器").HasMaxLength(50);
         entity.Property(e => e.CreateBy).HasColumnName("create_by").HasComment("创建人").HasMaxLength(50);
-        entity.Property(e => e.CreateTime).HasColumnName("create_time").HasComment("创建时间");
+        entity.Property(e => e.CreateTime).HasColumnName("create_time").HasComment("创建时间").HasMaxLength(6);
 
         OnConfigurePartial(entity);
     }

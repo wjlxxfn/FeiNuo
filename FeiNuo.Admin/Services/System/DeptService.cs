@@ -65,7 +65,7 @@ namespace FeiNuo.Admin.Services.System
             var entity = await FindByIdAsync(deptId);
             return entity.Adapt<DeptDto>();
         }
-		
+
         private async Task<DeptEntity> FindByIdAsync(int deptId)
         {
             return await ctx.Depts.FindAsync(deptId) ?? throw new NotFoundException($"找不到指定数据,Id:{deptId},Type:{typeof(DeptEntity)}");
@@ -181,7 +181,7 @@ namespace FeiNuo.Admin.Services.System
         /// </summary>
         private async Task<List<DeptEntity>> SelectDeptChildren(int deptId, bool includeSelf = true, bool noTracking = false)
         {
-            var sql = $@"WITH {(ctx.Database.IsMySql() ? "RECURSIVE " : "")} T AS ( 
+            var sql = $@"WITH RECURSIVE T AS ( 
                     SELECT *  FROM sys_dept WHERE dept_id = {deptId}
                     UNION ALL
                     SELECT A.* FROM sys_dept AS A INNER JOIN T
@@ -200,7 +200,7 @@ namespace FeiNuo.Admin.Services.System
         /// </summary>
         private async Task<List<DeptEntity>> SelectDeptParents(int deptId)
         {
-            var sql = $@"WITH {(ctx.Database.IsMySql() ? "RECURSIVE " : "")} T AS ( 
+            var sql = $@"WITH RECURSIVE T AS ( 
                     SELECT *  FROM sys_dept WHERE dept_id = {deptId}
                     UNION ALL
                     SELECT A.* FROM sys_dept AS A INNER JOIN T

@@ -1,6 +1,5 @@
 ﻿[
    {
-      "SchemaName": "dbo",
       "TablePatternReplaceWith": "",
       "TableRegexPattern": "(^md_|sys_)",
       "UseSchemaName": false

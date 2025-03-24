@@ -256,7 +256,7 @@ public partial class <#= EntityType.Name #>Configuration : IEntityTypeConfigurat
             genPropCodes = genPropCodes.Replace(".HasDefaultValueSql(\"''::character varying\")",".HasDefaultValue(\"\")");
             genPropCodes = genPropCodes.Replace(".HasDefaultValueSql(\"''::text\")",".HasDefaultValue(\"\")");
             genPropCodes = genPropCodes.Replace(".HasColumnType(\"timestamp without time zone\")","");
-            genPropCodes = genPropCodes.Replace(".IsUnicode(false)");
+            genPropCodes = genPropCodes.Replace(".IsUnicode(false)","");
 
 #>
         entity.Property(e => e.<#= property.Name #>)<#= genPropCodes #>;
@@ -327,7 +327,7 @@ public partial class <#= EntityType.Name #>Configuration : IEntityTypeConfigurat
                 usings.AddRange(joinKeyFluentApiCalls.GetRequiredUsings());
             }
 #>
-                    j.HasKey(<#= code.Arguments(joinKey.Properties.Select(e => e.Name)) #>)<#= code.Fragment(joinKeyFluentApiCalls, indent: 0).Replace("\r\n","") #>;
+                    j.HasKey(<#= code.Arguments(joinKey.Properties.Select(e => e.Name)) #>)<#= code.Fragment(joinKeyFluentApiCalls, indent: 0).Replace("\r\n","").Replace(".HasAnnotation(\"MySql:IndexPrefixLength\", new[] { 0, 0 })","") #>;
 <#
             var joinEntityTypeFluentApiCalls = joinEntityType.GetFluentApiCalls(annotationCodeGenerator);
             if (joinEntityTypeFluentApiCalls != null)
