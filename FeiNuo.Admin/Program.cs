@@ -39,21 +39,17 @@ public class Program
                     .Enrich.FromLogContext();
             });
             // 注入 EFCore
-            //var conn = builder.Configuration.GetConnectionString("MySql");
-            //var conn = builder.Configuration.GetConnectionString("SqlServer");
-            var conn = builder.Configuration.GetConnectionString("PgSql");
+            var conn = builder.Configuration.GetConnectionString("MySql");
             builder.Services.AddDbContext<FNDbContext>(opt =>
             {
-                // opt.UseMySql(conn, ServerVersion.Parse("8.0.26-mysql"), ops => ops.TranslateParameterizedCollectionsToConstants());
-                //opt.UseSqlServer(conn);
-                opt.UseNpgsql(conn);
+                opt.UseMySql(conn, ServerVersion.Parse("8.0.26-mysql"), ops => ops.TranslateParameterizedCollectionsToConstants());
+
                 if (builder.Environment.IsDevelopment())
                 {
                     opt.EnableSensitiveDataLogging();
                     opt.EnableDetailedErrors();
                 }
             });
-
             // 注入认证授权
             builder.Services.AddFNAspNetCore(builder.Configuration);
 

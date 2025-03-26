@@ -15,43 +15,43 @@
    "T4TemplatePath": null,
    "Tables": [
       {
-         "Name": "[dbo].[sys_config]",
+         "Name": "sys_config",
          "ObjectType": 0
       },
       {
-         "Name": "[dbo].[sys_dept]",
+         "Name": "sys_dept",
          "ObjectType": 0
       },
       {
-         "Name": "[dbo].[sys_dict]",
+         "Name": "sys_dict",
          "ObjectType": 0
       },
       {
-         "Name": "[dbo].[sys_dict_item]",
+         "Name": "sys_dict_item",
          "ObjectType": 0
       },
       {
-         "Name": "[dbo].[sys_log]",
+         "Name": "sys_log",
          "ObjectType": 0
       },
       {
-         "Name": "[dbo].[sys_menu]",
+         "Name": "sys_menu",
          "ObjectType": 0
       },
       {
-         "Name": "[dbo].[sys_role]",
+         "Name": "sys_role",
          "ObjectType": 0
       },
       {
-         "Name": "[dbo].[sys_role_menu]",
+         "Name": "sys_role_menu",
          "ObjectType": 0
       },
       {
-         "Name": "[dbo].[sys_user]",
+         "Name": "sys_user",
          "ObjectType": 0
       },
       {
-         "Name": "[dbo].[sys_user_role]",
+         "Name": "sys_user_role",
          "ObjectType": 0
       }
    ],

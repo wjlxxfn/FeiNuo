@@ -38,7 +38,7 @@ public partial class UserEntity : BaseEntity
     /// <summary>
     /// 性别：M/F/O
     /// </summary>
-    public char Gender { get; set; }
+    public string Gender { get; set; } = null!;
 
     /// <summary>
     /// 手机号码
@@ -95,7 +95,7 @@ public partial class UserConfiguration : IEntityTypeConfiguration<UserEntity>
         entity.Property(e => e.Nickname).HasColumnName("nickname").HasComment("用户昵称").HasMaxLength(50);
         entity.Property(e => e.Password).HasColumnName("password").HasComment("登录密码").HasMaxLength(50);
         entity.Property(e => e.DeptId).HasColumnName("dept_id").HasComment("部门ID");
-        entity.Property(e => e.Gender).HasColumnName("gender").HasComment("性别：M/F/O").IsFixedLength();
+        entity.Property(e => e.Gender).HasColumnName("gender").HasComment("性别：M/F/O").IsFixedLength().HasMaxLength(1);
         entity.Property(e => e.Cellphone).HasColumnName("cellphone").HasComment("手机号码").HasMaxLength(20);
         entity.Property(e => e.Email).HasColumnName("email").HasComment("电子邮箱").HasMaxLength(100);
         entity.Property(e => e.Avatar).HasColumnName("avatar").HasComment("头像").HasMaxLength(200);
@@ -103,9 +103,9 @@ public partial class UserConfiguration : IEntityTypeConfiguration<UserEntity>
         entity.Property(e => e.Introduction).HasColumnName("introduction").HasComment("自我介绍").HasMaxLength(500);
         entity.Property(e => e.Remark).HasColumnName("remark").HasComment("备注").HasMaxLength(200);
         entity.Property(e => e.CreateBy).HasColumnName("create_by").HasComment("创建人").HasMaxLength(50);
-        entity.Property(e => e.CreateTime).HasColumnName("create_time").HasComment("创建时间");
+        entity.Property(e => e.CreateTime).HasColumnName("create_time").HasComment("创建时间").HasMaxLength(6);
         entity.Property(e => e.UpdateBy).HasColumnName("update_by").HasComment("修改人").HasMaxLength(50);
-        entity.Property(e => e.UpdateTime).HasColumnName("update_time").HasComment("修改时间");
+        entity.Property(e => e.UpdateTime).HasColumnName("update_time").HasComment("修改时间").HasMaxLength(6);
 
         entity.HasOne(d => d.Dept).WithMany(p => p.Users)
             .HasForeignKey(d => d.DeptId)

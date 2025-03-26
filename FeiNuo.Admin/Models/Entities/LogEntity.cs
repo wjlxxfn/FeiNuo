@@ -87,7 +87,7 @@ public partial class LogConfiguration : IEntityTypeConfiguration<LogEntity>
         entity.Property(e => e.LogId).HasColumnName("log_id").HasComment("日志ID");
         entity.Property(e => e.OperateType).HasColumnName("operate_type").HasComment("操作类型");
         entity.Property(e => e.LogTitle).HasColumnName("log_title").HasComment("日志类别(简短描述)").HasDefaultValue("").HasMaxLength(50);
-        entity.Property(e => e.LogContent).HasColumnName("log_content").HasComment("日志内容").HasDefaultValue("");
+        entity.Property(e => e.LogContent).HasColumnName("log_content").HasComment("日志内容").HasDefaultValueSql("_utf8mb4\\'\\'");
         entity.Property(e => e.RequestPath).HasColumnName("request_path").HasComment("请求URL").HasMaxLength(200);
         entity.Property(e => e.RequestMethod).HasColumnName("request_method").HasComment("请求方式").HasMaxLength(50);
         entity.Property(e => e.RequestParam).HasColumnName("request_param").HasComment("请求参数");
@@ -97,7 +97,7 @@ public partial class LogConfiguration : IEntityTypeConfiguration<LogEntity>
         entity.Property(e => e.ClientOs).HasColumnName("client_os").HasComment("客户端操作系统").HasMaxLength(50);
         entity.Property(e => e.ClientBrowser).HasColumnName("client_browser").HasComment("客户端浏览器").HasMaxLength(50);
         entity.Property(e => e.CreateBy).HasColumnName("create_by").HasComment("创建人").HasMaxLength(50);
-        entity.Property(e => e.CreateTime).HasColumnName("create_time").HasComment("创建时间");
+        entity.Property(e => e.CreateTime).HasColumnName("create_time").HasComment("创建时间").HasMaxLength(6);
 
         OnConfigurePartial(entity);
     }
